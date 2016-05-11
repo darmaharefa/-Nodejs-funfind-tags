@@ -9,8 +9,14 @@ var twit = require('twitter'),
 var count = 0,
 	tweets = [];
 
-twitter.get('search/tweets', {q: '#supermanzzz'}, function(error, tweets, response){
+/*twitter.get('search/tweets', {q: '#supermanzzz'}, function(error, tweets, response){
   if(error) throw error;
   console.log(tweets);  // The favorites. 
   console.log(response);  // Raw response object. 
+});*/
+
+twitter.post('statuses/update', {status: 'Tes ngetweet'}, function(error, tweet, response){
+  if (!error) {
+    console.log(tweet);
+  }
 });
