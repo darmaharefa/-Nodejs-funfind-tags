@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Home</title>
+</head>
+<body>
+	<table>
+		{% for i in tweets %}
+			<tr>
+				<td>{{ loop.index }}</td>
+				<td>{{ i.text }}</td>
+			</tr>
+		{% endfor %}
+	</table>
+</body>
+</html>
