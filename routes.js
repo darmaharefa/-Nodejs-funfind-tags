@@ -4,7 +4,8 @@ var express	= require("express"),
 	router;
 
 router = function(app){
-	r.get("/", h.user_timeline);
+	r.get("/", h.home);
+	r.get("/timeline", h.timeline);
 	app.use(r);
 };
 
