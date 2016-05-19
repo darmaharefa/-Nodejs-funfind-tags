@@ -1,4 +1,4 @@
-var twitter = require('twitter'),
+var twitter = require('twit'),
     config  = require('./config'),
     handler, home, bot;
 
@@ -44,9 +44,9 @@ salam_kenal = function(req, res){
   stream.on('follow', followed);
 
   function followed(event){
-    var nama        = event.source.name;
+    var name        = event.source.name;
     var screenName  = event.source.screen_name;
-    auto_twit('Hallo @'+screen_name+' Thanks udah follow ya ' + name + ', Kamu kenal #funfindteam ?');
+    auto_twit('Hallo @'+screenName+' Thanks udah follow ya ' + name + ', Kamu kenal #funfindteam ?');
   }
 }
 
