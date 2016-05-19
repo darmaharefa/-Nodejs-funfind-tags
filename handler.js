@@ -2,11 +2,8 @@ var twitter = require('twitter'),
     config  = require('./config'),
     handler, txt, home;
 
-
-
 var result = new Array();
-
-var client = new twitter(config);
+var T      = new twitter(config);
 
 // user_timeline = function(req, res, next) {
 //   // https://dev.twitter.com/rest/reference/get/statuses/user_timeline
@@ -21,25 +18,25 @@ var client = new twitter(config);
 //   });
 // };
 
-function getStream(){
-  client.stream('statuses/filter', {track: 'harefatag1, harefatag2'},  function(stream){
-    stream.on('data', function(data) {
-      // console.log(data.text);
-      if (data.entities && data.entities.hashtags.length > 0 ) {
-        saveHastag(data);
-      }
-    });
-    stream.on('error', function(error) {
-      console.log(error);
-    });
-  });
-}
+// function getStream(){
+//   client.stream('statuses/filter', {track: 'harefatag1, harefatag2'},  function(stream){
+//     stream.on('data', function(data) {
+//       // console.log(data.text);
+//       if (data.entities && data.entities.hashtags.length > 0 ) {
+//         saveHastag(data);
+//       }
+//     });
+//     stream.on('error', function(error) {
+//       console.log(error);
+//     });
+//   });
+// }
 
-function saveHastag(data) {
-    var actualHashtag = data.entities.hashtags[0].text.toLowerCase();
-    result.push(data.text);
-    console.log(result);
-}
+// function saveHastag(data) {
+//     var actualHashtag = data.entities.hashtags[0].text.toLowerCase();
+//     result.push(data.text);
+//     console.log(result);
+// }
 
 home = function(req, res){
     getStream();
