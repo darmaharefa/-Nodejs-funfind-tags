@@ -6,6 +6,7 @@ var express	= require("express"),
 router = function(app){
 	r.get("/", h.home);
 	r.get("/acak", h.random_twit);
+	r.get("/follow", h.salam_kenal);
 	app.use(r);
 };
 

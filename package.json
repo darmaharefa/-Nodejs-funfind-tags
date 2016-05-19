@@ -19,6 +19,7 @@
   "dependencies": {
     "express": "^4.13.4",
     "nunjucks": "^2.4.2",
+    "twit": "^2.2.4",
     "twitter": "^1.2.5"
   }
 }
