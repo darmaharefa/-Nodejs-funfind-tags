@@ -1,9 +1,9 @@
 var twitter = require('twitter'),
     config  = require('./config'),
-    handler, txt, home;
+    handler, home, bot;
 
-var result = new Array();
-var T      = new twitter(config);
+var result    = new Array();
+var twit      = new twitter(config);
 
 // user_timeline = function(req, res, next) {
 //   // https://dev.twitter.com/rest/reference/get/statuses/user_timeline
@@ -38,14 +38,38 @@ var T      = new twitter(config);
 //     console.log(result);
 // }
 
+random_twit  = function(req, res){
+  //Create Random Number
+  r = Math.random()*100;
+
+  //Post a status to twitter account
+  twit.post('statuses/update', {status: 'Holla this is tweet of ' + r + ' from #funfindteam MWA Pagi '},
+    function(error, tweet, response) {
+      if (error) {
+        console.log("Gagal Ngetwit");
+        console.log(error);
+      }
+      else{
+        console.log('Berhasil Ngetwit');
+        res.sendStatus(200);
+      }
+    });
+}
+
 home = function(req, res){
-    getStream();
-    res.sendStatus(200);
+    //Get Favorite List
+    twit.get('search/tweets', {q: '#funfindteam'}, function(error, tweets, response) {
+        if(error) {console.log("Something Wrong!");}
+        else{
+          console.log(tweets);
+          res.sendStatus(200);
+        }
+    });
 };
 
 handler = {
 	home : home,
-	// user_timeline : user_timeline
+	random_twit : random_twit
 }
 
 module.exports = handler;
