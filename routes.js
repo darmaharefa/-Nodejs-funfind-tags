@@ -5,8 +5,8 @@ var express	= require("express"),
 
 router = function(app){
 	r.get("/", h.home);
-	r.get("/acak", h.random_twit);
-	r.get("/follow", h.salam_kenal);
+	r.get("/login", h.login);
+	r.get("/signin-with-twitter",h.callback);
 	app.use(r);
 };
 

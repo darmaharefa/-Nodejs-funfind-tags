@@ -1,0 +1,12 @@
+<h1>Welcome {{viewData.username}} </h1>
+<h3>Your last 10 tweets</h3>
+<ul>
+  	<table>
+  		{% for tweet in viewData.tweets %}
+			<tr>
+				<td>{{loop.index}}</td>
+				<td>{{tweet.text}}</td>
+			</tr>
+		{% endfor %}
+  	</table>
+</ul>
