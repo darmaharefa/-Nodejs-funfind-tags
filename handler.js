@@ -54,7 +54,7 @@ function auto_twit(text){
   //Create Random Number
   var r     = Math.random()*100;
   var param = { 
-    status: text || 'Holla this is tweet of ' + r + ' from #funfindteam MWA Pagi '
+    status: text || 'Holla this is tweet of ' + r + ' from #RizkiRidhoKarnavalInboxPati  '
   };
 
   function action(error,tweet,response){
@@ -68,11 +68,13 @@ function auto_twit(text){
   }
 
   //Post a status to twitter account
-  twit.post('statuses/update',param,action);
+    twit.post('statuses/update',param,action);
+    return 0;
 }
 
 random_twit  = function(req, res){
   auto_twit();
+  // setInterval(auto_twit('Hello aja'), 5000);
   res.sendStatus(200);
 }
 
