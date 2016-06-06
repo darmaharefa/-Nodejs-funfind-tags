@@ -31,17 +31,15 @@ login = function(req, res){
   request.post({url : requestTokenUrl, oauth : oauth}, function (e, r, body){
 
     if(e){
-      res.send("error");
+      res.send("Error, Silahkan coba beberapa saat lagi");
     }
     else {
-      //Parsing the Query String containing the oauth_token and oauth_secret.
-      console.log(body);
+      //Parsing  Query String yang berisi oauth_token dan oauth_secret.
       var reqData = qs.parse(body);
       oauthToken = reqData.oauth_token;
       oauthTokenSecret = reqData.oauth_token_secret;
 
-      //Step-2 Redirecting the user by creating a link
-      //and allowing the user to click the link
+      //Langkah-2 Redirect user ke link yang telah dibuat
       var uri = 'https://api.twitter.com/oauth/authenticate'
       + '?' + qs.stringify({oauth_token: oauthToken})
       res.render('login.html', {url : uri});
@@ -56,43 +54,80 @@ callback  = function(req, res){
   oauth.verifier = authReqData.oauth_verifier;
 
   var accessTokenUrl = "https://api.twitter.com/oauth/access_token";
-  //Step-3 Converting the request token to an access token
-  request.post({url : accessTokenUrl , oauth : oauth}, function(e, r, body){
-    var authenticatedData = qs.parse(body);
-    console.log(authenticatedData);
+  //Langkah-3 Convert request token menjadi access token
+  //access token akan dipakai untuk berinteraksi dengan API Twitter
 
-  //Make a request to get User's 10 latest tweets
-  var apiUrl = "https://api.twitter.com/1.1/statuses/user_timeline.json" + "?"
-    + qs.stringify({screen_name: authenticatedData.screen_name, count: 10});
+  userdata = {};
 
-  var authenticationData = {
-    consumer_key : CONSUMER_KEY,
-    consumer_secret : CONSUMER_SECRET,
-    token: authenticatedData.oauth_token,
-    token_secret : authenticatedData.oauth_token_secret
-  };
 
-  request.get({url : apiUrl, oauth: authenticationData, json:true}, function(e, r, body){
+  request.post(
+    {
+      url   : accessTokenUrl , 
+      oauth : oauth
+    },
+    function(e, r, body)
+    {
+      var authenticatedData = qs.parse(body);
+      // console.log(authenticatedData);
 
-    var tweets = [];
-    for(i in body){
-      var tweetObj = body[i];
-      tweets.push({text: tweetObj.text});
+      //Get 10 Twit terakhir dari user yang melakukan sign in
+      var lasttwit = "https://api.twitter.com/1.1/statuses/user_timeline.json" + "?"
+        + qs.stringify({screen_name: authenticatedData.screen_name, count: 10});
+
+      //Get jumlah follower user
+      var follower = "https://api.twitter.com/1.1/users/show.json" + "?"
+        + qs.stringify({screen_name: authenticatedData.screen_name});
+
+
+      var authenticationData = {
+        consumer_key    : CONSUMER_KEY,
+        consumer_secret : CONSUMER_SECRET,
+        token           : authenticatedData.oauth_token,
+        token_secret    : authenticatedData.oauth_token_secret
+      };
+
+      request.get(
+        {
+          url : lasttwit,
+          oauth: authenticationData,
+          json:true
+        }, 
+        function(e, r, body){
+          var tweets = [];
+          for(i in body){
+            var tweetObj = body[i];
+
+            tweets.push({text: tweetObj.text});
+          }
+
+          userdata.username   = authenticatedData.screen_name;
+          userdata.lasttweets = tweets;
+          console.log(userdata);
+          res.render('dashboard.html',{'userdata':userdata})
+        }
+      );
+
+      request.get(
+        {
+          url   : follower,
+          oauth : authenticationData,
+          json  : true
+        },
+        function(e, r, body){
+          userdata.name             = body.name;
+          userdata.description      = body.description;
+          userdata.follower         = body.followers_count;
+          userdata.following        = body.friends_count;
+          userdata.created          = body.created_at;
+          userdata.location         = body.location;
+          userdata.tweets_count     = body.statuses_count;
+          userdata.followers_ratio  = userdata.follower / userdata.following;
+          console.log('body'+userdata);
+        }
+      )
     }
-    
-    var viewData = {
-      username: authenticatedData.screen_name,
-      tweets: tweets
-    };
-
-    // console.log(viewData);
-
-    res.render("dashboard.html", {'viewData':viewData});
-
-  });
-
-  });
-}
+  );
+};
 
 handler = {
 	home         : home,
