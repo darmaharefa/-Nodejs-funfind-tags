@@ -78,6 +78,8 @@ callback  = function(req, res){
       var follower = "https://api.twitter.com/1.1/users/show.json" + "?"
         + qs.stringify({screen_name: authenticatedData.screen_name});
 
+      var mentions =  "https://api.twitter.com/1.1/statuses/mentions_timeline.json";
+
 
       var authenticationData = {
         consumer_key    : CONSUMER_KEY,
@@ -86,43 +88,70 @@ callback  = function(req, res){
         token_secret    : authenticatedData.oauth_token_secret
       };
 
+      // request.get(
+      //   {
+      //     url : lasttwit,
+      //     oauth: authenticationData,
+      //     json:true
+      //   }, 
+      //   function(e, r, body){
+      //     var tweets = [];
+      //     for(i in body){
+      //       var tweetObj = body[i];
+
+      //       tweets.push({text: tweetObj.text});
+      //     }
+
+      //     userdata.username   = authenticatedData.screen_name;
+      //     userdata.lasttweets = tweets;
+      //     console.log(userdata);
+      //     res.render('dashboard.html',{'userdata':userdata})
+      //   }
+      // );
+
+      // request.get(
+      //   {
+      //     url   : follower,
+      //     oauth : authenticationData,
+      //     json  : true
+      //   },
+      //   function(e, r, body){
+
+      //     //Twitter Info
+      //     userdata.name             = body.name;
+      //     userdata.description      = body.description;
+      //     userdata.location         = body.location;
+      //     userdata.tweets_count     = body.statuses_count;
+
+      //     //Followers Info
+      //     userdata.follower         = body.followers_count;
+      //     userdata.following        = body.friends_count;
+      //     userdata.created          = body.created_at;
+      //     userdata.listed           = body.listed_count;
+      //     userdata.followers_ratio  = userdata.follower / userdata.following;
+      //     console.log(userdata);
+      //   }
+      // );
+
       request.get(
         {
-          url : lasttwit,
-          oauth: authenticationData,
-          json:true
-        }, 
-        function(e, r, body){
-          var tweets = [];
-          for(i in body){
-            var tweetObj = body[i];
-
-            tweets.push({text: tweetObj.text});
-          }
-
-          userdata.username   = authenticatedData.screen_name;
-          userdata.lasttweets = tweets;
-          console.log(userdata);
-          res.render('dashboard.html',{'userdata':userdata})
-        }
-      );
-
-      request.get(
-        {
-          url   : follower,
+          url   : mentions,
           oauth : authenticationData,
           json  : true
         },
         function(e, r, body){
-          userdata.name             = body.name;
-          userdata.description      = body.description;
-          userdata.follower         = body.followers_count;
-          userdata.following        = body.friends_count;
-          userdata.created          = body.created_at;
-          userdata.location         = body.location;
-          userdata.tweets_count     = body.statuses_count;
-          userdata.followers_ratio  = userdata.follower / userdata.following;
-          console.log('body'+userdata);
+          //Mentions Info
+          var usermention = [];
+          for(i in body){
+            usermention.push(
+              {
+                id    : body[i].user.id, 
+                name  : body[i].user.screen_name,
+                img   : body[i].user.profile_image_url
+              }
+            );
+          }
+          console.log(usermention);
         }
       )
     }
