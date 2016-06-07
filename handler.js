@@ -72,7 +72,7 @@ callback  = function(req, res){
 
       //Get 10 Twit terakhir dari user yang melakukan sign in
       var lasttwit = "https://api.twitter.com/1.1/statuses/user_timeline.json" + "?"
-        + qs.stringify({screen_name: authenticatedData.screen_name, count: 10});
+        + qs.stringify({screen_name: authenticatedData.screen_name, count: 100});
 
       //Get jumlah follower user
       var follower = "https://api.twitter.com/1.1/users/show.json" + "?"
@@ -89,6 +89,7 @@ callback  = function(req, res){
         token_secret    : authenticatedData.oauth_token_secret
       };
 
+      // Get Last Tweet
       request.get(
         {
           url : lasttwit,
@@ -96,94 +97,116 @@ callback  = function(req, res){
           json:true
         }, 
         function(e, r, body){
-          var tweets = [];
+          // var tweets = [];
+          var usermention_count = 0;
+          var hastag_count      = 0;
+          var link_count        = 0;
+
           for(i in body){
-            var tweetObj = body[i];
+            // var tweetObj = body[i];
 
-            tweets.push({text: tweetObj.text});
+            // tweets.push({text: tweetObj.text});
+
+            // Cek apakah terdapat user_mentions disetiap tweet dari user
+            if(body[i].entities.user_mentions.length > 0)
+              usermention_count += 1;
+
+            // Cek apakah terdapat hastag disetiap tweet dari user
+            if(body[i].entities.hashtags.length > 0)
+              hastag_count += 1;
+
+            // Cek apakah terdapat url disetiap tweet dari user
+            if(body[i].entities.urls.length > 0)
+              link_count += 1;
+
           }
+            console.log(usermention_count);
+            console.log(hastag_count);
+            console.log(link_count);
 
-          userdata.username   = authenticatedData.screen_name;
-          userdata.lasttweets = tweets;
-          console.log(userdata);
+          // userdata.username   = authenticatedData.screen_name;
+          // userdata.lasttweets = tweets;
+          // console.log(userdata);
         }
       );
 
-      request.get(
-        {
-          url   : follower,
-          oauth : authenticationData,
-          json  : true
-        },
-        function(e, r, body){
+      // // Get Detail Follower
+      // request.get(
+      //   {
+      //     url   : follower,
+      //     oauth : authenticationData,
+      //     json  : true
+      //   },
+      //   function(e, r, body){
 
-          //Twitter Info
-          userdata.name             = body.name;
-          userdata.description      = body.description;
-          userdata.location         = body.location;
-          userdata.tweets_count     = body.statuses_count;
+      //     //Twitter Info
+      //     userdata.name             = body.name;
+      //     userdata.description      = body.description;
+      //     userdata.location         = body.location;
+      //     userdata.tweets_count     = body.statuses_count;
 
-          //Followers Info
-          userdata.follower         = body.followers_count;
-          userdata.following        = body.friends_count;
-          userdata.created          = body.created_at;
-          userdata.listed           = body.listed_count;
-          userdata.followers_ratio  = userdata.follower / userdata.following;
-          console.log(userdata);
-        }
-      );
+      //     //Followers Info
+      //     userdata.follower         = body.followers_count;
+      //     userdata.following        = body.friends_count;
+      //     userdata.created          = body.created_at;
+      //     userdata.listed           = body.listed_count;
+      //     userdata.followers_ratio  = userdata.follower / userdata.following;
+      //     console.log(userdata);
+      //   }
+      // );
 
-      request.get(
-        {
-          url   : mentions,
-          oauth : authenticationData,
-          json  : true
-        },
-        function(e, r, body){
-          //Mentions Info
-          var usermention = [];
+      // // Get Mentions Info
+      // request.get(
+      //   {
+      //     url   : mentions,
+      //     oauth : authenticationData,
+      //     json  : true
+      //   },
+      //   function(e, r, body){
+      //     //Mentions Info
+      //     var usermention = [];
 
-          for(i=0; i<body.length; i++){
-            if(i===0)
-              usermention.push(
-                {
-                  id    : body[i].user.id,
-                  nama  : body[i].user.screen_name,
-                  // img   : body[i].user.profile_image_url,
-                  count : 1
-                }
-              );
-            if(i>0){
-              var cek = 0;
-              for(j = 0; j < usermention.length; j++){
-                if((body[i].user.id  === usermention[j].id) === true){
-                  cek = 1;
-                  pos = j;
-                  break;
-                } 
-              }
+      //     for(i=0; i<body.length; i++){
+      //       if(i===0)
+      //         usermention.push(
+      //           {
+      //             id    : body[i].user.id,
+      //             nama  : body[i].user.screen_name,
+      //             // img   : body[i].user.profile_image_url,
+      //             count : 1
+      //           }
+      //         );
+      //       if(i>0){
+      //         var cek = 0;
+      //         for(j = 0; j < usermention.length; j++){
+      //           if((body[i].user.id  === usermention[j].id) === true){
+      //             cek = 1;
+      //             pos = j;
+      //             break;
+      //           } 
+      //         }
               
-              if(cek === 0){
-                usermention.push(
-                  {
-                    id    : body[i].user.id,
-                    nama  : body[i].user.screen_name,
-                    // img   : body[i].user.profile_image_url,
-                    count : 1
-                  }
-                );
-              }
-              else{
-                usermention[pos].count += 1;
-              }
-            }
-          }
-          // console.log(usermention);
-          userdata.mentions = usermention;
-          console.log(userdata);
-          res.render('dashboard.html',{'userdata':userdata});
-        }
-      )
+      //         if(cek === 0){
+      //           usermention.push(
+      //             {
+      //               id    : body[i].user.id,
+      //               nama  : body[i].user.screen_name,
+      //               // img   : body[i].user.profile_image_url,
+      //               count : 1
+      //             }
+      //           );
+      //         }
+      //         else{
+      //           usermention[pos].count += 1;
+      //         }
+      //       }
+      //     }
+      //     // console.log(usermention);
+      //     userdata.mentions = usermention;
+      //     console.log(userdata);
+      //     res.render('dashboard.html',{'userdata':userdata});
+      //   }
+      // )
     }
   );
 };
