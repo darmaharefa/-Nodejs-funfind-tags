@@ -78,7 +78,8 @@ callback  = function(req, res){
       var follower = "https://api.twitter.com/1.1/users/show.json" + "?"
         + qs.stringify({screen_name: authenticatedData.screen_name});
 
-      var mentions =  "https://api.twitter.com/1.1/statuses/mentions_timeline.json";
+      var mentions =  "https://api.twitter.com/1.1/statuses/mentions_timeline.json" + "?"
+        + qs.stringify({count : 30});
 
 
       var authenticationData = {
@@ -88,50 +89,49 @@ callback  = function(req, res){
         token_secret    : authenticatedData.oauth_token_secret
       };
 
-      // request.get(
-      //   {
-      //     url : lasttwit,
-      //     oauth: authenticationData,
-      //     json:true
-      //   }, 
-      //   function(e, r, body){
-      //     var tweets = [];
-      //     for(i in body){
-      //       var tweetObj = body[i];
+      request.get(
+        {
+          url : lasttwit,
+          oauth: authenticationData,
+          json:true
+        }, 
+        function(e, r, body){
+          var tweets = [];
+          for(i in body){
+            var tweetObj = body[i];
 
-      //       tweets.push({text: tweetObj.text});
-      //     }
+            tweets.push({text: tweetObj.text});
+          }
 
-      //     userdata.username   = authenticatedData.screen_name;
-      //     userdata.lasttweets = tweets;
-      //     console.log(userdata);
-      //     res.render('dashboard.html',{'userdata':userdata})
-      //   }
-      // );
+          userdata.username   = authenticatedData.screen_name;
+          userdata.lasttweets = tweets;
+          console.log(userdata);
+        }
+      );
 
-      // request.get(
-      //   {
-      //     url   : follower,
-      //     oauth : authenticationData,
-      //     json  : true
-      //   },
-      //   function(e, r, body){
+      request.get(
+        {
+          url   : follower,
+          oauth : authenticationData,
+          json  : true
+        },
+        function(e, r, body){
 
-      //     //Twitter Info
-      //     userdata.name             = body.name;
-      //     userdata.description      = body.description;
-      //     userdata.location         = body.location;
-      //     userdata.tweets_count     = body.statuses_count;
+          //Twitter Info
+          userdata.name             = body.name;
+          userdata.description      = body.description;
+          userdata.location         = body.location;
+          userdata.tweets_count     = body.statuses_count;
 
-      //     //Followers Info
-      //     userdata.follower         = body.followers_count;
-      //     userdata.following        = body.friends_count;
-      //     userdata.created          = body.created_at;
-      //     userdata.listed           = body.listed_count;
-      //     userdata.followers_ratio  = userdata.follower / userdata.following;
-      //     console.log(userdata);
-      //   }
-      // );
+          //Followers Info
+          userdata.follower         = body.followers_count;
+          userdata.following        = body.friends_count;
+          userdata.created          = body.created_at;
+          userdata.listed           = body.listed_count;
+          userdata.followers_ratio  = userdata.follower / userdata.following;
+          console.log(userdata);
+        }
+      );
 
       request.get(
         {
@@ -142,16 +142,46 @@ callback  = function(req, res){
         function(e, r, body){
           //Mentions Info
           var usermention = [];
-          for(i in body){
-            usermention.push(
-              {
-                id    : body[i].user.id, 
-                name  : body[i].user.screen_name,
-                img   : body[i].user.profile_image_url
+
+          for(i=0; i<body.length; i++){
+            if(i===0)
+              usermention.push(
+                {
+                  id    : body[i].user.id,
+                  nama  : body[i].user.screen_name,
+                  // img   : body[i].user.profile_image_url,
+                  count : 1
+                }
+              );
+            if(i>0){
+              var cek = 0;
+              for(j = 0; j < usermention.length; j++){
+                if((body[i].user.id  === usermention[j].id) === true){
+                  cek = 1;
+                  pos = j;
+                  break;
+                } 
               }
-            );
+              
+              if(cek === 0){
+                usermention.push(
+                  {
+                    id    : body[i].user.id,
+                    nama  : body[i].user.screen_name,
+                    // img   : body[i].user.profile_image_url,
+                    count : 1
+                  }
+                );
+              }
+              else{
+                usermention[pos].count += 1;
+              }
+            }
           }
-          console.log(usermention);
+          // console.log(usermention);
+          userdata.mentions = usermention;
+          console.log(userdata);
+          res.render('dashboard.html',{'userdata':userdata});
         }
       )
     }

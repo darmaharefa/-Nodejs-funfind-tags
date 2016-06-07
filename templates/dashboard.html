@@ -55,5 +55,18 @@
 	</tr>
 </table>
 
+<p>@Mentions</p>
+<table>
+	{% for mention in userdata.mentions %}
+	<tr>
+		<td>{{loop.index}}</td>
+		<!-- <td><img src="{{mention.img}}"></td> -->
+		<!-- <td>{{mention.id}}</td> -->
+		<td>{{mention.nama}}</td>
+		<td>{{mention.count}}</td>
+	</tr>
+{% endfor %}
+</table>
+
 
 
