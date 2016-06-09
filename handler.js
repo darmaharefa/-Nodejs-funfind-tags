@@ -92,15 +92,20 @@ callback  = function(req, res){
       // Get Last Tweet
       request.get(
         {
-          url : lasttwit,
-          oauth: authenticationData,
-          json:true
+          url   : lasttwit,
+          oauth : authenticationData,
+          json  : true
         }, 
         function(e, r, body){
           // var tweets = [];
           var usermention_count = 0;
           var hastag_count      = 0;
           var link_count        = 0;
+          var replay_count      = 0;
+          var retweet_count     = 0;
+          var media_count       = 0;
+          var urls_catch        = [];
+
 
           for(i in body){
             // var tweetObj = body[i];
@@ -116,13 +121,71 @@ callback  = function(req, res){
               hastag_count += 1;
 
             // Cek apakah terdapat url disetiap tweet dari user
-            if(body[i].entities.urls.length > 0)
+            if(body[i].entities.urls.length > 0) {
               link_count += 1;
 
+              // Simpan setiap url yang ada dalam tweet ke dalam array urls_catch
+              var urls_tmp    = body[i].entities.urls;
+              for(var j = 0; j<body[i].entities.urls.length; j++)
+              {
+                // Regex untuk mengambil parent domain/url
+                var regXurl    = /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)/;
+                var tmp_exec   = regXurl.exec(urls_tmp[j].expanded_url);
+
+                if(tmp_exec!= null){
+                  urls_catch.push(tmp_exec[0]);
+                }
+              }
+            }
+
+            // Cek apakah terdapat replay disetiap tweet dari user
+            if(body[i].in_reply_to_user_id != undefined)
+              replay_count += 1;
+
+            // Cek apakah user pernah melakukan retweet status
+            if(body[i].is_quote_status === true)
+              retweet_count += 1;
+
+            // Cek apakah terdapat tweet dengan menggunakan media (images/photos)
+            if(body[i].entities.hasOwnProperty('media'))
+              media_count += 1;
+
           }
-            console.log(usermention_count);
-            console.log(hastag_count);
-            console.log(link_count);
+         
+          //Hitung jumlah masing-masing url di dalam array urls_catch
+          var url_obj = [];
+          for(i=0; i<urls_catch.length; i++){
+            if(i===0)
+              url_obj.push(
+                {
+                  url : urls_catch[i],
+                  count : 1
+                }
+              );
+            if(i>0){
+              var cek = 0;
+              for(j = 0; j < url_obj.length; j++){
+                if((urls_catch[i] === url_obj[j].url) === true){
+                  cek = 1;
+                  pos = j;
+                  break;
+                } 
+              }
+              
+              if(cek === 0){
+                url_obj.push(
+                  {
+                    url : urls_catch[i],
+                    count : 1
+                  }
+                );
+              }
+              else{
+                url_obj[pos].count += 1;
+              }
+            }
+          }
+          console.log(url_obj);
 
           // userdata.username   = authenticatedData.screen_name;
           // userdata.lasttweets = tweets;
