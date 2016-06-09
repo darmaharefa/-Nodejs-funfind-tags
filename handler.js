@@ -94,6 +94,8 @@ callback  = function(req, res){
       var replay_count      = 0;
       var retweet_count     = 0;
       var media_count       = 0;
+      var smile_count       = 0;
+      var sad_count         = 0;
       var tweets            = [];
       var mention_catch     = [];
       var mention_obj       = [];
@@ -111,66 +113,87 @@ callback  = function(req, res){
           json  : true
         }, 
         function(e, r, body){
-          for(i in body){
-            
-            // Ambil tweet dari user
-            var tweetObj = body[i];
-            tweets.push({text: tweetObj.text});
+          if(e){
+            console.log(e);
+            res.send(404);
+          }
+          else{
+            for(i in body){
+              // Ambil tweet dari user
+              var tweetObj = body[i];
+              tweets.push({text: tweetObj.text});
 
-            // Cek apakah terdapat user_mentions disetiap tweet dari user
-            if(body[i].entities.user_mentions.length > 0)
-              usermention_count += 1;
+              // Cek apakah terdapat user_mentions disetiap tweet dari user
+              if(body[i].entities.user_mentions.length > 0)
+                usermention_count += 1;
 
-            // Cek apakah terdapat hastag disetiap tweet dari user
-            if(body[i].entities.hashtags.length > 0)
-              hastag_count += 1;
+              // Cek apakah terdapat hastag disetiap tweet dari user
+              if(body[i].entities.hashtags.length > 0)
+                hastag_count += 1;
 
-            // Cek apakah terdapat replay disetiap tweet dari user
-            if(body[i].in_reply_to_user_id != undefined)
-              replay_count += 1;
+              // Cek apakah terdapat replay disetiap tweet dari user
+              if(body[i].in_reply_to_user_id != undefined)
+                replay_count += 1;
 
-            // Cek apakah user pernah melakukan retweet status
-            if(body[i].is_quote_status === true)
-              retweet_count += 1;
+              // Cek apakah user pernah melakukan retweet status
+              if(body[i].is_quote_status === true)
+                retweet_count += 1;
 
-            // Cek apakah terdapat tweet dengan menggunakan media (images/photos)
-            if(body[i].entities.hasOwnProperty('media'))
-              media_count += 1;
+              // Cek apakah terdapat tweet dengan menggunakan media (images/photos)
+              if(body[i].entities.hasOwnProperty('media'))
+                media_count += 1;
 
-            // Cek apakah terdapat url disetiap tweet dari user
-            if(body[i].entities.urls.length > 0) {
-              link_count += 1;
+              // Cek apakah terdapat url disetiap tweet dari user
+              if(body[i].entities.urls.length > 0) {
+                link_count += 1;
 
-              // Simpan setiap url yang ada dalam tweet ke dalam array url_catch
-              var urls_tmp    = body[i].entities.urls;
-              for(var j = 0; j<body[i].entities.urls.length; j++)
-              {
-                // Regex untuk mengambil parent domain/url
-                var regXurl    = /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)/;
-                var tmp_exec   = regXurl.exec(urls_tmp[j].expanded_url);
+                // Simpan setiap url yang ada dalam tweet ke dalam array url_catch
+                var urls_tmp    = body[i].entities.urls;
+                for(var j = 0; j<body[i].entities.urls.length; j++)
+                {
+                  // Regex untuk mengambil parent domain/url
+                  var regXurl    = /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)/;
+                  var tmp_exec   = regXurl.exec(urls_tmp[j].expanded_url);
 
-                if(tmp_exec!= null){
-                  url_catch.push({key : tmp_exec[0], text : tmp_exec[1], count : 0});
+                  if(tmp_exec!= null){
+                    url_catch.push({key : tmp_exec[0], text : tmp_exec[1], count : 0});
+                  }
                 }
+              }
+
+              // Cek twitter client yang digunakan user
+              if(body[i].source != undefined){
+                source_catch.push({key : body[i].source, count : 0});
+              }
+
+              // Cek apakah terdapat emoticon smile disetiap tweet dari user
+              // smile [ :) | ;) | =) | :-) | ;-) | :=) | ;=) ]
+              smileRegX = /([-=:;]+)\)/;
+              if(smileRegX.test(body[i].text)) {
+                smile_count += 1;
+              }
+
+              // Cek apakah terdapat emoticon sad disetiap tweet dari user
+              // smile [ :( | ;( | =( | :-( | ;-( | :=( | ;=( ]
+              smileRegX = /([-=:;]+)\(/;
+              if(smileRegX.test(body[i].text)) {
+                sad_count += 1;
+                console.log(body[i].text);
               }
             }
 
-            // Cek twitter client yang digunakan user
-            if(body[i].source != undefined){
-              source_catch.push({key : body[i].source, count : 0});
-            }
+            countToArrayObject(url_catch,     url_obj);
+            countToArrayObject(source_catch,  source_obj);
+
+            userdata.username   = authenticatedData.screen_name;
+            userdata.lasttweets = tweets;
+            userdata.sadtweet   = sad_count;
+            userdata.smiletweet = smile_count;
+            userdata.url_obj    = url_obj;
+            userdata.source_obj = source_obj;
+
+            res.render('dashboard.html',{'userdata':userdata});
           }
-
-          countToArrayObject(url_catch,     url_obj);
-          countToArrayObject(source_catch,  source_obj);
-
-          userdata.username   = authenticatedData.screen_name;
-          userdata.lasttweets = tweets;
-          userdata.url_obj    = url_obj;
-          userdata.source_obj = source_obj;
-
-          // console.log(userdata);
-          res.render('dashboard.html',{'userdata':userdata});
         }
       );
       // Get Detail Follower
