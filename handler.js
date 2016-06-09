@@ -57,9 +57,6 @@ callback  = function(req, res){
   //Langkah-3 Convert request token menjadi access token
   //access token akan dipakai untuk berinteraksi dengan API Twitter
 
-  userdata = {};
-
-
   request.post(
     {
       url   : accessTokenUrl , 
@@ -89,6 +86,23 @@ callback  = function(req, res){
         token_secret    : authenticatedData.oauth_token_secret
       };
 
+      var userdata          = {};
+
+      var usermention_count = 0;
+      var hastag_count      = 0;
+      var link_count        = 0;
+      var replay_count      = 0;
+      var retweet_count     = 0;
+      var media_count       = 0;
+      var tweets            = [];
+      var mention_catch     = [];
+      var mention_obj       = [];
+      var url_catch         = [];
+      var url_obj           = [];
+      var source_catch      = [];
+      var source_obj        = [];
+
+
       // Get Last Tweet
       request.get(
         {
@@ -97,20 +111,11 @@ callback  = function(req, res){
           json  : true
         }, 
         function(e, r, body){
-          // var tweets = [];
-          var usermention_count = 0;
-          var hastag_count      = 0;
-          var link_count        = 0;
-          var replay_count      = 0;
-          var retweet_count     = 0;
-          var media_count       = 0;
-          var urls_catch        = [];
-
-
           for(i in body){
-            // var tweetObj = body[i];
-
-            // tweets.push({text: tweetObj.text});
+            
+            // Ambil tweet dari user
+            var tweetObj = body[i];
+            tweets.push({text: tweetObj.text});
 
             // Cek apakah terdapat user_mentions disetiap tweet dari user
             if(body[i].entities.user_mentions.length > 0)
@@ -119,24 +124,6 @@ callback  = function(req, res){
             // Cek apakah terdapat hastag disetiap tweet dari user
             if(body[i].entities.hashtags.length > 0)
               hastag_count += 1;
-
-            // Cek apakah terdapat url disetiap tweet dari user
-            if(body[i].entities.urls.length > 0) {
-              link_count += 1;
-
-              // Simpan setiap url yang ada dalam tweet ke dalam array urls_catch
-              var urls_tmp    = body[i].entities.urls;
-              for(var j = 0; j<body[i].entities.urls.length; j++)
-              {
-                // Regex untuk mengambil parent domain/url
-                var regXurl    = /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)/;
-                var tmp_exec   = regXurl.exec(urls_tmp[j].expanded_url);
-
-                if(tmp_exec!= null){
-                  urls_catch.push(tmp_exec[0]);
-                }
-              }
-            }
 
             // Cek apakah terdapat replay disetiap tweet dari user
             if(body[i].in_reply_to_user_id != undefined)
@@ -150,129 +137,121 @@ callback  = function(req, res){
             if(body[i].entities.hasOwnProperty('media'))
               media_count += 1;
 
-          }
-         
-          //Hitung jumlah masing-masing url di dalam array urls_catch
-          var url_obj = [];
-          for(i=0; i<urls_catch.length; i++){
-            if(i===0)
-              url_obj.push(
-                {
-                  url : urls_catch[i],
-                  count : 1
+            // Cek apakah terdapat url disetiap tweet dari user
+            if(body[i].entities.urls.length > 0) {
+              link_count += 1;
+
+              // Simpan setiap url yang ada dalam tweet ke dalam array url_catch
+              var urls_tmp    = body[i].entities.urls;
+              for(var j = 0; j<body[i].entities.urls.length; j++)
+              {
+                // Regex untuk mengambil parent domain/url
+                var regXurl    = /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)/;
+                var tmp_exec   = regXurl.exec(urls_tmp[j].expanded_url);
+
+                if(tmp_exec!= null){
+                  url_catch.push({key : tmp_exec[0], text : tmp_exec[1], count : 0});
                 }
-              );
-            if(i>0){
-              var cek = 0;
-              for(j = 0; j < url_obj.length; j++){
-                if((urls_catch[i] === url_obj[j].url) === true){
-                  cek = 1;
-                  pos = j;
-                  break;
-                } 
-              }
-              
-              if(cek === 0){
-                url_obj.push(
-                  {
-                    url : urls_catch[i],
-                    count : 1
-                  }
-                );
-              }
-              else{
-                url_obj[pos].count += 1;
               }
             }
-          }
-          console.log(url_obj);
 
-          // userdata.username   = authenticatedData.screen_name;
-          // userdata.lasttweets = tweets;
+            // Cek twitter client yang digunakan user
+            if(body[i].source != undefined){
+              source_catch.push({key : body[i].source, count : 0});
+            }
+          }
+
+          countToArrayObject(url_catch,     url_obj);
+          countToArrayObject(source_catch,  source_obj);
+
+          userdata.username   = authenticatedData.screen_name;
+          userdata.lasttweets = tweets;
+          userdata.url_obj    = url_obj;
+          userdata.source_obj = source_obj;
+
           // console.log(userdata);
+          res.render('dashboard.html',{'userdata':userdata});
+        }
+      );
+      // Get Detail Follower
+      request.get(
+        {
+          url   : follower,
+          oauth : authenticationData,
+          json  : true
+        },
+        function(e, r, body){
+
+          //Twitter Info
+          userdata.name             = body.name;
+          userdata.description      = body.description;
+          userdata.location         = body.location;
+          userdata.tweets_count     = body.statuses_count;
+
+          //Followers Info
+          userdata.follower         = body.followers_count;
+          userdata.following        = body.friends_count;
+          userdata.created          = body.created_at;
+          userdata.listed           = body.listed_count;
+          userdata.followers_ratio  = userdata.follower / userdata.following;
         }
       );
 
-      // // Get Detail Follower
-      // request.get(
-      //   {
-      //     url   : follower,
-      //     oauth : authenticationData,
-      //     json  : true
-      //   },
-      //   function(e, r, body){
-
-      //     //Twitter Info
-      //     userdata.name             = body.name;
-      //     userdata.description      = body.description;
-      //     userdata.location         = body.location;
-      //     userdata.tweets_count     = body.statuses_count;
-
-      //     //Followers Info
-      //     userdata.follower         = body.followers_count;
-      //     userdata.following        = body.friends_count;
-      //     userdata.created          = body.created_at;
-      //     userdata.listed           = body.listed_count;
-      //     userdata.followers_ratio  = userdata.follower / userdata.following;
-      //     console.log(userdata);
-      //   }
-      // );
-
-      // // Get Mentions Info
-      // request.get(
-      //   {
-      //     url   : mentions,
-      //     oauth : authenticationData,
-      //     json  : true
-      //   },
-      //   function(e, r, body){
-      //     //Mentions Info
-      //     var usermention = [];
-
-      //     for(i=0; i<body.length; i++){
-      //       if(i===0)
-      //         usermention.push(
-      //           {
-      //             id    : body[i].user.id,
-      //             nama  : body[i].user.screen_name,
-      //             // img   : body[i].user.profile_image_url,
-      //             count : 1
-      //           }
-      //         );
-      //       if(i>0){
-      //         var cek = 0;
-      //         for(j = 0; j < usermention.length; j++){
-      //           if((body[i].user.id  === usermention[j].id) === true){
-      //             cek = 1;
-      //             pos = j;
-      //             break;
-      //           } 
-      //         }
-              
-      //         if(cek === 0){
-      //           usermention.push(
-      //             {
-      //               id    : body[i].user.id,
-      //               nama  : body[i].user.screen_name,
-      //               // img   : body[i].user.profile_image_url,
-      //               count : 1
-      //             }
-      //           );
-      //         }
-      //         else{
-      //           usermention[pos].count += 1;
-      //         }
-      //       }
-      //     }
-      //     // console.log(usermention);
-      //     userdata.mentions = usermention;
-      //     console.log(userdata);
-      //     res.render('dashboard.html',{'userdata':userdata});
-      //   }
-      // )
+      // Get Mentions Info
+      request.get(
+        {
+          url   : mentions,
+          oauth : authenticationData,
+          json  : true
+        },
+        function(e, r, body){
+          //Mentions Info
+          for(i in body){
+            mention_catch.push(
+              {
+                key   : body[i].user.id,
+                nama  : body[i].user.screen_name,
+                img   : body[i].user.profile_image_url,
+                count : 0
+              }
+            );     
+          }
+          countToArrayObject(mention_catch, mention_obj);
+        }
+      );
     }
   );
 };
+
+// Fungsi menghitung data yang sama dalam array
+// source   => array tempat menampung data dari twitter
+// storage  => array tempat menampung data hasil perhitungan
+function countToArrayObject(source, storage){
+  for(i=0; i<source.length; i++){
+    if(i===0){
+      storage.push(source[i]);
+      storage[i].count += 1
+    }
+    if(i>0){
+      var cek = 0;
+      for(j = 0; j < storage.length; j++){
+        if((source[i].key === storage[j].key) === true){
+          cek = 1;
+          pos = j;
+          break;
+        } 
+      }
+      
+      if(cek === 0){
+        storage.push(source[i]);
+        storage[storage.length -1 ].count += 1;
+      }
+      else{
+        storage[pos].count += 1;
+      }
+    }
+  }
+}
 
 handler = {
 	home         : home,
