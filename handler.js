@@ -23,7 +23,7 @@ var oauthToken = "";
 var oauthTokenSecret = "";
 
 home = function(req, res){
-  res.render('home.html');
+  res.render('index.html');
 }
 
 login = function(req, res){
