@@ -2,6 +2,8 @@ var express		= require("express"),
 	middleware	= require("./middleware"),
 	app			= express();
 
+app.use(express.static(__dirname + "/templates"));
+
 middleware(app);
 app.set('port', process.env.PORT || 3000);
 app.listen(app.get('port'), function(){
