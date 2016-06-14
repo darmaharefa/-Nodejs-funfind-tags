@@ -42,7 +42,7 @@ login = function(req, res){
       //Langkah-2 Redirect user ke link yang telah dibuat
       var uri = 'https://api.twitter.com/oauth/authenticate'
       + '?' + qs.stringify({oauth_token: oauthToken})
-      res.render('templates/pages/login.html', {url : uri});
+      res.render('pages/login.html', {url : uri});
       }
     });
 }
