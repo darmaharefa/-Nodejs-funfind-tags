@@ -22,11 +22,8 @@ var oauth = {
 var oauthToken = "";
 var oauthTokenSecret = "";
 
-home = function(req, res){
-  res.render('home.html');
-}
 
-login = function(req, res){
+home = function(req, res){
   //Langkah-1 Mengambil request token
   request.post({url : requestTokenUrl, oauth : oauth}, function (e, r, body){
 
@@ -44,7 +41,7 @@ login = function(req, res){
       //and allowing the user to click the link
       var uri = 'https://api.twitter.com/oauth/authenticate'
       + '?' + qs.stringify({oauth_token: oauthToken})
-      res.render('login.html', {url : uri});
+      res.render('index.html', {url : uri});
       }
     });
 }
@@ -96,7 +93,6 @@ callback  = function(req, res){
 
 handler = {
 	home         : home,
-  login        : login,
   callback     : callback
 }
 
