@@ -1,12 +1,97 @@
-<h1>Welcome {{viewData.username}} </h1>
+<h1>Welcome {{userdata.username}} </h1>
+
 <h3>Your last 10 tweets</h3>
-<ul>
-  	<table>
-  		{% for tweet in viewData.tweets %}
-			<tr>
-				<td>{{loop.index}}</td>
-				<td>{{tweet.text}}</td>
-			</tr>
-		{% endfor %}
-  	</table>
-</ul>
+<table>
+	{% for tweet in userdata.lasttweets %}
+	<tr>
+		<td>{{loop.index}}</td>
+		<td>{{tweet.text}}</td>
+	</tr>
+{% endfor %}
+</table>
+
+
+<p>Informasi Akun Twitter Anda</p>
+<table>
+	<tr>
+		<td>Nama</td>
+		<td>{{userdata.name}}</td>
+	</tr>
+	<tr>
+		<td>Bergabung di twitter</td>
+		<td>{{userdata.created}}</td>
+	</tr>
+	<tr>
+		<td>Lokasi</td>
+		<td>{{userdata.location}}</td>
+	</tr>
+	<tr>
+		<td>Deskripsi</td>
+		<td>{{userdata.description}}</td>
+	</tr>
+</table>
+
+<p>Ratio Akun Twitter Akun Anda</p>
+<table>
+	<tr>
+		<td>Tweets</td>
+		<td>{{userdata.tweets_count}}</td>
+	</tr>
+	<tr>
+		<td>Follower</td>
+		<td>{{userdata.follower}}</td>
+	</tr>
+	<tr>
+		<td>Following</td>
+		<td>{{userdata.following}}</td>
+	</tr>
+	<tr>
+		<td>Followers Ratio</td>
+		<td>{{userdata.followers_ratio}}</td>
+	</tr>
+	<tr>
+		<td>Listed</td>
+		<td>{{userdata.listed}}</td>
+	</tr>
+</table>
+
+<p>@Mentions</p>
+<table>
+	{% for mention in userdata.mentions %}
+	<tr>
+		<td>{{loop.index}}</td>
+		<!-- <td><img src="{{mention.img}}"></td> -->
+		<!-- <td>{{mention.key}}</td> -->
+		<td>{{mention.nama}}</td>
+		<td>{{mention.count}}</td>
+	</tr>
+	{% endfor %}
+</table>
+
+<p>Domain paling banyak tehubung</p>
+<table>
+	{% for url in userdata.url_obj %}
+	<tr>
+		<td>{{ loop.index }}</td>
+		<td><a href="{{ url.key }}">{{ url.text }}</a></td>
+		<td>{{ url.count }}</td>
+	</tr>
+	{% endfor %}
+</table>
+
+
+<p>Twitter client paling banyak digunakan</p>
+<table>
+	{% for source in userdata.source_obj %}
+	<tr>
+		<td>{{ loop.index }}</td>
+		<!-- <td>{{ source.key }}</td> -->
+		<td>{{ source.key | safe}}</td>
+		<td>{{ source.count }}</td>
+	</tr>
+	{% endfor %}
+</table>
+
+<p>Twitter dengan emoticon senyum ada <b>{{userdata.smiletweet}}</b> tweet</p>
+<p>Twitter dengan emoticon sedih ada <b>{{userdata.sadtweet}}</b> tweet</p>
+
