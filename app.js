@@ -2,7 +2,7 @@ var express		= require("express"),
 	middleware	= require("./middleware"),
 	app			= express();
 
-app.use(express.static(__dirname + "/templates"));
+app.use(express.static(__dirname + "/public"));
 
 middleware(app);
 app.set('port', process.env.PORT || 3000);

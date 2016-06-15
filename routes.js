@@ -6,6 +6,7 @@ var express	= require("express"),
 router = function(app){
 	r.get("/", h.home);
 	r.get("/login", h.login);
+	// r.get("/analytic", h.analytic);
 	r.get("/signin-with-twitter",h.callback);
 	app.use(r);
 };
