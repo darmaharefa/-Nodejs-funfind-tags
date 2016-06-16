@@ -24,6 +24,7 @@ var oauth = {
 var oauthToken = "";
 var oauthTokenSecret = "";
 
+<<<<<<< HEAD
 home = function(req, res){
   if(oauth.token == "")
     res.render('home.html');
@@ -31,6 +32,12 @@ home = function(req, res){
 
 login = function(req, res){
   //langkah-1 Mengambil request token
+=======
+
+
+home = function(req, res){
+  //Langkah-1 Mengambil request token
+>>>>>>> 6e5a24b4f0ca3b12ec0a83fed29f557f6771a17d
   request.post({url : requestTokenUrl, oauth : oauth}, function (e, r, body){
 
     if(e){
@@ -45,7 +52,11 @@ login = function(req, res){
       //Langkah-2 Redirect user ke link yang telah dibuat
       var uri = 'https://api.twitter.com/oauth/authenticate'
       + '?' + qs.stringify({oauth_token: oauthToken})
+<<<<<<< HEAD
         res.render('login.html', {url : uri});
+=======
+      res.render('index.html', {url : uri});
+>>>>>>> 6e5a24b4f0ca3b12ec0a83fed29f557f6771a17d
       }
 
     console.log(body);
@@ -282,9 +293,13 @@ function countToArrayObject(source, storage){
 }
 
 handler = {
+<<<<<<< HEAD
 	home         : home,
   login        : login,
   // analytic     : analytic,
+=======
+  home         : home,
+>>>>>>> 6e5a24b4f0ca3b12ec0a83fed29f557f6771a17d
   callback     : callback
 }
 
