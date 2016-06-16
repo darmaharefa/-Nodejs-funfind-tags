@@ -300,6 +300,15 @@ String.prototype.parseHashtag = function() {
 	});
 };
 
+// Fungsi untuk parsing twitter @mention dari text
+// data twet dari api adalah plain text
+// parsing @mention dari plain text dan diubah ke link http://twitter.com/"+username
+String.prototype.parseUsername = function() {
+	return this.replace(/[@]+[A-Za-z0-9-_]+/g, function(u) {
+		var username = u.replace("@","")
+		return u.link("http://twitter.com/"+username);
+	});
+};
 
 
 handler = {
