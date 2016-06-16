@@ -290,6 +290,16 @@ String.prototype.parseURL = function() {
 	});
 };
 
+// Fungsi untuk parsing twitter hastag dari text
+// data tweet dari api adalah plain text
+// parsing hastag dari plain text dan diubah ke link http://search.twitter.com/search?q="+hastag
+String.prototype.parseHashtag = function() {
+	return this.replace(/[#]+[A-Za-z0-9-_]+/g, function(t) {
+		var tag = t.replace("#","%23")
+		return t.link("http://search.twitter.com/search?q="+tag);
+	});
+};
+
 
 
 handler = {
