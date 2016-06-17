@@ -48,7 +48,7 @@ login = function(req, res){
         res.render('login.html', {url : uri});
       }
 
-    console.log(body);
+    // console.log(body);
   });
 }
 
@@ -70,14 +70,14 @@ callback  = function(req, res){
     function(e, r, body)
     {
       var authenticatedData = qs.parse(body);
-      console.log(body);
+      // console.log(body);
 
       //Get 10 Twit terakhir dari user yang melakukan sign in
-      var lasttwit = "https://api.twitter.com/1.1/statuses/user_timeline.json" + "?"
+      var usertimeline = "https://api.twitter.com/1.1/statuses/user_timeline.json" + "?"
         + qs.stringify({screen_name: authenticatedData.screen_name, count: 100});
 
       //Get jumlah follower user
-      var follower = "https://api.twitter.com/1.1/users/show.json" + "?"
+      var userprofile = "https://api.twitter.com/1.1/users/show.json" + "?"
         + qs.stringify({screen_name: authenticatedData.screen_name});
 
       var mentions =  "https://api.twitter.com/1.1/statuses/mentions_timeline.json" + "?"
@@ -91,6 +91,7 @@ callback  = function(req, res){
         token_secret    : authenticatedData.oauth_token_secret
       };
 
+      // Objeck yang akan menyimpan seluruh data yang telah diolah dan dikirimkan ke view
       var userdata          = {};
 
       var usermention_count = 0;
@@ -101,7 +102,13 @@ callback  = function(req, res){
       var media_count       = 0;
       var smile_count       = 0;
       var sad_count         = 0;
-      var tweets            = [];
+
+      // array untuk menyimpan user timeline / tweet terakhir dari user
+      var lasttweets        = {};
+
+      // objek untuk menyimpan profile dari user
+      var profile           = {};
+
       var mention_catch     = [];
       var mention_obj       = [];
       var url_catch         = [];
@@ -110,142 +117,159 @@ callback  = function(req, res){
       var source_obj        = [];
 
 
-      // Get UserTimeline
+      Get UserTimeline
       request.get(
         {
-          url   : lasttwit,
+          url   : usertimeline,
           oauth : authenticationData,
           json  : true
         }, 
         function(e, r, body){
           if(e){
-            console.log(e);
             res.send(404);
           }
           else{
             for(i in body){
+              var tweets = [];
+
               // Ambil tweet dari user
               var tweetObj = body[i];
-              tweets.push({text: tweetObj.text});
-
-              // Cek apakah terdapat user_mentions disetiap tweet dari user
-              if(body[i].entities.user_mentions.length > 0)
-                usermention_count += 1;
-
-              // Cek apakah terdapat hastag disetiap tweet dari user
-              if(body[i].entities.hashtags.length > 0)
-                hastag_count += 1;
-
-              // Cek apakah terdapat replay disetiap tweet dari user
-              if(body[i].in_reply_to_user_id != undefined)
-                replay_count += 1;
-
-              // Cek apakah user pernah melakukan retweet status
-              if(body[i].is_quote_status === true)
-                retweet_count += 1;
-
-              // Cek apakah terdapat tweet dengan menggunakan media (images/photos)
-              if(body[i].entities.hasOwnProperty('media'))
-                media_count += 1;
-
-              // Cek apakah terdapat url disetiap tweet dari user
-              if(body[i].entities.urls.length > 0) {
-                link_count += 1;
-
-                // Simpan setiap url yang ada dalam tweet ke dalam array url_catch
-                var urls_tmp    = body[i].entities.urls;
-                for(var j = 0; j<body[i].entities.urls.length; j++)
+              tweets.push(
                 {
-                  // Regex untuk mengambil parent domain/url
-                  var regXurl    = /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)/;
-                  var tmp_exec   = regXurl.exec(urls_tmp[j].expanded_url);
+                  text        : tweetObj.text.parseURL().parseHashtag().parseUsername(),
+                  name        : tweetObj.user.name,
+                  screen_name : tweetObj.user.screen_name,
+                  created_at  : tweetObj.created_at.parseDate(),
+                  source      : 
 
-                  if(tmp_exec!= null){
-                    url_catch.push({key : tmp_exec[0], text : tmp_exec[1], count : 0});
-                  }
                 }
+              );
+
+      //       //   // Cek apakah terdapat user_mentions disetiap tweet dari user
+      //       //   if(body[i].entities.user_mentions.length > 0)
+      //       //     usermention_count += 1;
+
+      //       //   // Cek apakah terdapat hastag disetiap tweet dari user
+      //       //   if(body[i].entities.hashtags.length > 0)
+      //       //     hastag_count += 1;
+
+      //       //   // Cek apakah terdapat replay disetiap tweet dari user
+      //       //   if(body[i].in_reply_to_user_id != undefined)
+      //       //     replay_count += 1;
+
+      //       //   // Cek apakah user pernah melakukan retweet status
+      //       //   if(body[i].is_quote_status === true)
+      //       //     retweet_count += 1;
+
+      //       //   // Cek apakah terdapat tweet dengan menggunakan media (images/photos)
+      //       //   if(body[i].entities.hasOwnProperty('media'))
+      //       //     media_count += 1;
+
+      //       //   // Cek apakah terdapat url disetiap tweet dari user
+      //       //   if(body[i].entities.urls.length > 0) {
+      //       //     link_count += 1;
+
+      //       //     // Simpan setiap url yang ada dalam tweet ke dalam array url_catch
+      //       //     var urls_tmp    = body[i].entities.urls;
+      //       //     for(var j = 0; j<body[i].entities.urls.length; j++)
+      //       //     {
+      //       //       // Regex untuk mengambil parent domain/url
+      //       //       var regXurl    = /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)/;
+      //       //       var tmp_exec   = regXurl.exec(urls_tmp[j].expanded_url);
+
+      //       //       if(tmp_exec!= null){
+      //       //         url_catch.push({key : tmp_exec[0], text : tmp_exec[1], count : 0});
+      //       //       }
+      //       //     }
               }
 
-              // Cek twitter client yang digunakan user
-              if(body[i].source != undefined){
-                source_catch.push({key : body[i].source, count : 0});
-              }
+      //       //   // Cek twitter client yang digunakan user
+      //       //   if(body[i].source != undefined){
+      //       //     source_catch.push({key : body[i].source, count : 0});
+      //       //   }
 
-              // Cek apakah terdapat emoticon smile disetiap tweet dari user
-              // smile [ :) | ;) | =) | :-) | ;-) | :=) | ;=) ]
-              smileRegX = /([-=:;]+)\)/;
-              if(smileRegX.test(body[i].text)) {
-                smile_count += 1;
-              }
+      //       //   // Cek apakah terdapat emoticon smile disetiap tweet dari user
+      //       //   // smile [ :) | ;) | =) | :-) | ;-) | :=) | ;=) ]
+      //       //   smileRegX = /([-=:;]+)\)/;
+      //       //   if(smileRegX.test(body[i].text)) {
+      //       //     smile_count += 1;
+      //       //   }
 
-              // Cek apakah terdapat emoticon sad disetiap tweet dari user
-              // smile [ :( | ;( | =( | :-( | ;-( | :=( | ;=( ]
-              smileRegX = /([-=:;]+)\(/;
-              if(smileRegX.test(body[i].text)) {
-                sad_count += 1;
-              }
-            }
+      //       //   // Cek apakah terdapat emoticon sad disetiap tweet dari user
+      //       //   // smile [ :( | ;( | =( | :-( | ;-( | :=( | ;=( ]
+      //       //   smileRegX = /([-=:;]+)\(/;
+      //       //   if(smileRegX.test(body[i].text)) {
+      //       //     sad_count += 1;
+      //       //   }
+      //       // }
 
-            countToArrayObject(url_catch,     url_obj);
-            countToArrayObject(source_catch,  source_obj);
+      //       // countToArrayObject(url_catch,     url_obj);
+      //       // countToArrayObject(source_catch,  source_obj);
 
-            userdata.username   = authenticatedData.screen_name;
-            userdata.lasttweets = tweets;
-            userdata.sadtweet   = sad_count;
-            userdata.smiletweet = smile_count;
-            userdata.url_obj    = url_obj;
-            userdata.source_obj = source_obj;
+      //       // userdata.username   = authenticatedData.screen_name;
+            userdata.tweets     = tweets;
+      //       // userdata.sadtweet   = sad_count;
+      //       // userdata.smiletweet = smile_count;
+      //       // userdata.url_obj    = url_obj;
+      //       // userdata.source_obj = source_obj;
 
-            res.render('dashboard.html',{'userdata':userdata});
+      //       // res.render('dashboard.html',{'userdata':userdata});
           }
         }
       );
+
       // Get Detail Follower
       request.get(
         {
-          url   : follower,
+          url   : userprofile,
           oauth : authenticationData,
           json  : true
         },
         function(e, r, body){
 
           //Twitter Info
-          userdata.name             = body.name;
-          userdata.description      = body.description;
-          userdata.location         = body.location;
-          userdata.tweets_count     = body.statuses_count;
+          profile.name             = body.name;
+          profile.screen_name      = body.screen_name;
+          profile.img              = body.profile_image_url;
+          profile.description      = body.description;
+          profile.location         = body.location;
+          profile.tweets_count     = body.statuses_count;
+          profile.created          = body.created_at;
+          profile.statuses_count   = body.statuses_count;
 
           //Followers Info
-          userdata.follower         = body.followers_count;
-          userdata.following        = body.friends_count;
-          userdata.created          = body.created_at;
-          userdata.listed           = body.listed_count;
-          userdata.followers_ratio  = userdata.follower / userdata.following;
+          profile.follower         = body.followers_count;
+          profile.following        = body.friends_count;
+          profile.listed           = body.listed_count;
+          profile.followers_ratio  = (profile.follower / profile.following).toFixed(2);
+
+          userdata.profile = profile;
+          res.render('dashboard.html',{'userdata':userdata});
         }
       );
 
       // Get Mentions Info
-      request.get(
-        {
-          url   : mentions,
-          oauth : authenticationData,
-          json  : true
-        },
-        function(e, r, body){
-          //Mentions Info
-          for(i in body){
-            mention_catch.push(
-              {
-                key   : body[i].user.id,
-                nama  : body[i].user.screen_name,
-                img   : body[i].user.profile_image_url,
-                count : 0
-              }
-            );     
-          }
-          countToArrayObject(mention_catch, mention_obj);
-        }
-      );
+      // request.get(
+      //   {
+      //     url   : mentions,
+      //     oauth : authenticationData,
+      //     json  : true
+      //   },
+      //   function(e, r, body){
+      //     //Mentions Info
+      //     for(i in body){
+      //       mention_catch.push(
+      //         {
+      //           key   : body[i].user.id,
+      //           nama  : body[i].user.screen_name,
+      //           img   : body[i].user.profile_image_url,
+      //           count : 0
+      //         }
+      //       );     
+      //     }
+      //     countToArrayObject(mention_catch, mention_obj);
+      //   }
+      // );
     }
   );
 };
@@ -301,7 +325,7 @@ String.prototype.parseHashtag = function() {
 };
 
 // Fungsi untuk parsing twitter @mention dari text
-// data twet dari api adalah plain text
+// data tweet dari api adalah plain text
 // parsing @mention dari plain text dan diubah ke link http://twitter.com/"+username
 String.prototype.parseUsername = function() {
 	return this.replace(/[@]+[A-Za-z0-9-_]+/g, function(u) {
@@ -309,6 +333,16 @@ String.prototype.parseUsername = function() {
 		return u.link("http://twitter.com/"+username);
 	});
 };
+
+// Fungsi untuk parsing twitter created_at menjadi format date umum
+// contoh data tweet dari api = "Fri Jun 10 15:02:50 +0000 2016"
+// parsing created_at dan diubah menjadi "15:02:50 - 10 Jun 2016"
+String.prototype.parseDate = function(){
+  tmp = this.split(" ");
+  return tmp[3]+" - "+tmp[2]+" "+tmp[1]+" "+tmp[5];
+}
+
+
 
 
 handler = {
