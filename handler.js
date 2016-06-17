@@ -72,9 +72,13 @@ callback  = function(req, res){
       var authenticatedData = qs.parse(body);
       // console.log(body);
 
-      //Get 10 Twit terakhir dari user yang melakukan sign in
-      var usertimeline = "https://api.twitter.com/1.1/statuses/user_timeline.json" + "?"
-        + qs.stringify({screen_name: authenticatedData.screen_name, count: 100});
+      // Get 10 Twit terakhir dari user yang melakukan sign in
+      var ut = "https://api.twitter.com/1.1/statuses/user_timeline.json" + "?"
+        + qs.stringify({screen_name: authenticatedData.screen_name, count: 10});
+
+      // Get 10 Twit terakhir dari home / orang yang difollow
+      var ht = "https://api.twitter.com/1.1/statuses/home_timeline.json" + "?"
+        + qs.stringify({count: 10});
 
       //Get jumlah follower user
       var userprofile = "https://api.twitter.com/1.1/users/show.json" + "?"
@@ -103,12 +107,6 @@ callback  = function(req, res){
       var smile_count       = 0;
       var sad_count         = 0;
 
-      // array untuk menyimpan user timeline / tweet terakhir dari user
-      var lasttweets        = {};
-
-      // objek untuk menyimpan profile dari user
-      var profile           = {};
-
       var mention_catch     = [];
       var mention_obj       = [];
       var url_catch         = [];
@@ -120,7 +118,7 @@ callback  = function(req, res){
       //Get UserTimeline
       request.get(
         {
-          url   : usertimeline,
+          url   : ut,
           oauth : authenticationData,
           json  : true
         }, 
@@ -129,18 +127,20 @@ callback  = function(req, res){
             res.send(404);
           }
           else{
+            var usertimeline = [];
             for(i in body){
-              var tweets = [];
-
               // Ambil tweet dari user
               var tweetObj = body[i];
-              tweets.push(
+              usertimeline.push(
                 {
-                  text        : tweetObj.text.parseURL().parseHashtag().parseUsername(),
-                  name        : tweetObj.user.name,
-                  screen_name : tweetObj.user.screen_name,
-                  created_at  : tweetObj.created_at.parseDate(),
-                  source      : 
+                  text            : tweetObj.text.parseURL().parseHashtag().parseUsername(),
+                  name            : tweetObj.user.name,
+                  screen_name     : tweetObj.user.screen_name,
+                  img             : tweetObj.user.profile_image_url,
+                  created_at      : tweetObj.created_at.parseDate(),
+                  source          : tweetObj.source.parseSource(),
+                  retweet_count   : tweetObj.retweet_count,
+                  favorite_count  : tweetObj.favorite_count
 
                 }
               );
@@ -207,16 +207,48 @@ callback  = function(req, res){
       //       // countToArrayObject(source_catch,  source_obj);
 
       //       // userdata.username   = authenticatedData.screen_name;
-            userdata.tweets     = tweets;
+            userdata.usertimeline     = usertimeline;
       //       // userdata.sadtweet   = sad_count;
       //       // userdata.smiletweet = smile_count;
       //       // userdata.url_obj    = url_obj;
       //       // userdata.source_obj = source_obj;
-
-      //       // res.render('dashboard.html',{'userdata':userdata});
           }
         }
       );
+
+      // Get Home Timeline
+        request.get(
+        {
+          url   : ht,
+          oauth : authenticationData,
+          json  : true
+        }, 
+        function(e, r, body){
+          if(e){
+            res.send(404);
+          }
+          else{
+            var hometimeline = [];
+            for(i in body){
+              // Ambil tweet dari user
+              var tweetObj = body[i];
+              hometimeline.push(
+                {
+                  text            : tweetObj.text.parseURL().parseHashtag().parseUsername(),
+                  name            : tweetObj.user.name,
+                  screen_name     : tweetObj.user.screen_name,
+                  img             : tweetObj.user.profile_image_url,
+                  created_at      : tweetObj.created_at.parseDate(),
+                  source          : tweetObj.source.parseSource(),
+                  retweet_count   : tweetObj.retweet_count,
+                  favorite_count  : tweetObj.favorite_count
+                }
+              );
+            }
+            userdata.hometimeline  = hometimeline;
+            res.render('dashboard.html',{'userdata':userdata});
+          }
+        });
 
       // Get Detail Follower
       request.get(
@@ -226,6 +258,7 @@ callback  = function(req, res){
           json  : true
         },
         function(e, r, body){
+          var profile = {};
 
           //Twitter Info
           profile.name             = body.name;
@@ -244,7 +277,6 @@ callback  = function(req, res){
           profile.followers_ratio  = (profile.follower / profile.following).toFixed(2);
 
           userdata.profile = profile;
-          res.render('dashboard.html',{'userdata':userdata});
         }
       );
 
@@ -320,7 +352,7 @@ String.prototype.parseURL = function() {
 String.prototype.parseHashtag = function() {
 	return this.replace(/[#]+[A-Za-z0-9-_]+/g, function(t) {
 		var tag = t.replace("#","%23")
-		return t.link("http://search.twitter.com/search?q="+tag);
+		return t.link("https://twitter.com/search?q="+tag);
 	});
 };
 
@@ -340,6 +372,13 @@ String.prototype.parseUsername = function() {
 String.prototype.parseDate = function(){
   tmp = this.split(" ");
   return tmp[3]+" - "+tmp[2]+" "+tmp[1]+" "+tmp[5];
+}
+
+// Fungsi untuk parsing source textcontent dari anchor (a href tag)
+// contoh data tweet dari api = "<a href="http://www.google.com/" rel="nofollow">Google</a>"
+// parsing source dan hasil menjadi "Google"
+String.prototype.parseSource = function(){
+  return /<a [^>]+>([^<]+)<\/a>/.exec(this)[1];
 }
 
 

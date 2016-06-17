@@ -4,6 +4,8 @@
 
 {% block content %}
 
+{% include "part/menu.html" %}
+
 <div class="container">
 	<div class="row">
 		<div class="col-md-6">
@@ -62,16 +64,43 @@
 	<div class="row">
 		<div class="col-md-6">	
 			<div class="list-group">
-			   	<button type="button" class="list-group-item active">User Timeline</button>
-				{% for tweet in userdata.tweets %}
-			  	<button type="button" class="list-group-item">Dapibus ac facilisis in</button>
-			  	<button type="button" class="list-group-item">Morbi leo risus</button>
-			  	<button type="button" class="list-group-item">Porta ac consectetur ac</button>
-			  	<button type="button" class="list-group-item">Vestibulum at eros</button>
+			   	<button type="button" class="list-group-item active">{{ userdata.profile.name }} Timeline</button>
+				{% for tweet in userdata.usertimeline %}
+			  	<button type="button" class="list-group-item">
+			  			<span class="col-sm-2">
+			  				<img src="{{tweet.img}}" alt="user-img">
+			  			</span>
+			  			<span class="col-sm-10">
+		  					<span class="col-sm-12">
+		  						{{ tweet.name }} @{{ tweet.screen_name }} {{ tweet.created_at }} via {{ tweet.source }} R {{ tweet.retweet_count }} F {{ tweet.favorite_count }}
+		  					</span>
+			  				<span class="col-sm-12">
+			  					{{ tweet.text | safe }}
+			  				</span>
+			  			</span>
+			  	</button>
 				{% endfor %}
 			</div>
+		</div>
 		<div class="col-md-6">	
-				
+			<div class="list-group">
+			   	<button type="button" class="list-group-item active">Home Timeline</button>
+				{% for tweet in userdata.hometimeline %}
+			  	<button type="button" class="list-group-item">
+			  			<span class="col-sm-2">
+			  				<img src="{{tweet.img}}" alt="user-img">
+			  			</span>
+			  			<span class="col-sm-10">
+		  					<span class="col-sm-12">
+		  						{{ tweet.name }} @{{ tweet.screen_name }} {{ tweet.created_at }} via {{ tweet.source }} R {{ tweet.retweet_count }} F {{ tweet.favorite_count }}
+		  					</span>
+			  				<span class="col-sm-12">
+			  					{{ tweet.text | safe }}
+			  				</span>
+			  			</span>
+			  	</button>
+				{% endfor %}
+			</div>
 		</div>
 	</div>
 </div>
