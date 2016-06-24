@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/darmaharefa/funfind-beta#readme",
   "dependencies": {
+    "cookie-parser": "^1.4.3",
     "express": "^4.13.4",
     "express-session": "^1.13.0",
     "nunjucks": "^2.4.2",
