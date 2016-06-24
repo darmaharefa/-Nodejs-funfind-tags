@@ -4,6 +4,8 @@ var twitter = require('twit'),
     request = require('request'),
     handler;
 
+var User = require('./model/user');
+  
 //url untuk Request Token dari Twitter
 var requestTokenUrl = "https://api.twitter.com/oauth/request_token";
 
@@ -28,7 +30,6 @@ home = function(req, res){
 }
 
 login = function(req, res){
-
     var cookie = req.cookies.token;
     console.log(cookie);
     if(cookie === undefined){
@@ -82,9 +83,27 @@ callback  = function(req, res){
     function(e, r, body)
     {
       var authenticatedData = qs.parse(body);
-      console.log(authenticatedData);
-      console.log(oauth);
 
+      User.find({user_id : authenticatedData.user_id}, function (err, docs) {
+        if (!docs.length){
+
+          var user = new User({
+            user_id             : authenticatedData.user_id,
+            oauth_token         : authenticatedData.oauth_token,
+            oauth_token_secret  : authenticatedData.oauth_token_secret,
+            screen_name         : authenticatedData.screen_name,
+            x_auth_expires      : authenticatedData.x_auth_expires,
+            premium             : 0,
+          });
+
+          user.save(function(err) {
+            if (err) throw err;
+
+            console.log('User saved successfully!');
+          });
+        }
+      });
+       
       res.cookie(
         'token',authenticatedData.screen_name, {
         domain: 'localhost',
@@ -96,9 +115,6 @@ callback  = function(req, res){
       oauth.token = "";
       oauth.token_secret = "";
       oauth.verifier = "";
-
-      
-      console.log(oauth);
 
       res.redirect("/dashboard");
     }
