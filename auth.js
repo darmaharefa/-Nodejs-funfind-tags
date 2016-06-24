@@ -1,11 +1,11 @@
 function unauthorized(res){
-	return res.redirect("/");
+	return res.redirect("/login");
 };
 
 function auth(req, res, next){
-	user = req.cookies.token || "--";
+	user = req.cookies.token || "";
 	console.log(user);
-	if (user != "--"){
+	if (user != ""){
 		return next();
 	};
 	return unauthorized(res);

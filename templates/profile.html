@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %} Hasil Analisa Twitter Anda {% endblock %}
+
+{% block content %}
+
+{% include "part/menu.html" %}
+
+<div class="container">
+	<div class="row">
+		<div class="col-md-6">
+			<div class="col-md-2">
+				<img src="{{ userdata.profile.img}}" alt="user-images">
+			</div>
+			<div class="col-md-10">
+				<div class="row">
+					<div class="col-sm-12">
+						<a href="http://twitter.com/{{ userdata.profile.screen_name }}">
+							@{{userdata.profile.screen_name}}
+						</a>
+						{{ userdata.profile.name }}
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-12">
+						<span class="label label-default">{{ userdata.profile.statuses_count }}</span> <span class="txtGrey">tweets</span>
+						<span class="label label-success">{{ userdata.profile.follower }}</span> follower
+						<span class="label label-primary">{{ userdata.profile.following }}</span> following
+						<span class="label label-danger">{{ userdata.profile.listed }}</span> listed
+						<span class="label label-default">{{ userdata.profile.followers_ratio }}</span> ratio 
+						<img src="img/icons/13x11-grey-question-sign.png" alt="question-sign" data-toggle="tooltip" data-placement="right" title="Perbandingan antara follower / following">
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<table class="table table-hover tableAnalytic">
+				<thead>
+					<tr>
+						<th>Tweets Analytic</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							<span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>
+							<span class="label label-primary">1.71</span>
+							<span class="tableAnalyticLabel">tweets per day</span>
+							<img src="img/icons/13x11-grey-question-sign.png" alt="question-sign" data-toggle="tooltip" data-placement="right" title="Rata-rata tweet yang kamu lakukan setiap hari. Semakin tinggi angkanya, menandakan kamu semakin aktif ditwitter ">
+						</td>
+						<td>
+							<span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>
+							<span class="label label-primary">3</span>
+							<span class="tableAnalyticLabel">user mentions</span>
+							<img src="img/icons/13x11-grey-question-sign.png" alt="question-sign" data-toggle="tooltip" data-placement="right" title="Rata-rata mention yang kamu lakukan. Semakin tinggi angkanya, semakin sering kamu berinteraksi dengan orang lain">
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>
+							<span class="label label-primary">1</span>
+							<span class="tableAnalyticLabel">tweets retweeted</span>
+							<img src="img/icons/13x11-grey-question-sign.png" alt="question-sign" data-toggle="tooltip" data-placement="right" title="Persentase dari tweet kamu yang pernah diretweet oleh orang lain.">
+						</td>
+						<td>
+							<span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>
+							<span class="label label-primary">1</span>
+							<span class="tableAnalyticLabel">replies</span>
+							<img src="img/icons/13x11-grey-question-sign.png" alt="question-sign" data-toggle="tooltip" data-placement="right" title="Persentase dari tweet kamu yang pernah direply oleh orang lain">
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>
+							<span class="label label-primary">1</span>
+							<span class="tableAnalyticLabel">links</span>
+							<img src="img/icons/13x11-grey-question-sign.png" alt="question-sign" data-toggle="tooltip" data-placement="right" title="Jumlah tweet dari kamu yang menggunakan link/url. Semakin tinggi angkanya, menandakan kamu sumber informasi untuk orang lain">
+						</td>
+						<td>
+							<span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>
+							<span class="label label-primary">1</span>
+							<span class="tableAnalyticLabel">hastags</span>
+							<img src="img/icons/13x11-grey-question-sign.png" alt="question-sign" data-toggle="tooltip" data-placement="right" title="Jumlah tweet dari kamu yang menggunakan hastag">
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>
+							<span class="label label-primary">1</span>
+							<span class="tableAnalyticLabel">tweets favorited</span>
+							<img src="img/icons/13x11-grey-question-sign.png" alt="question-sign" data-toggle="tooltip" data-placement="right" title="Jumlah tweet dari kamu yang pernah difavoritkan orang lain.">
+						</td>
+						<td>
+							<span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>
+							<span class="label label-primary">1</span>
+							<span class="tableAnalyticLabel">hastags</span>
+							<img src="img/icons/13x11-grey-question-sign.png" alt="question-sign" data-toggle="tooltip" data-placement="right" title="Jumlah tweet dari kamu yang menggunakan hastag">
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6">
+			<p>Selamat datang {{ userdata.profile.name }}. Kamu sedang menggunakan akun free. <a href="" class="btn-btn-primary">Upgrade</a> untuk mengakses fitur premium </p>
+			<p>Jika anda merasa senang dengan aplikasi kami, Silahkan share aplikasi Ngitwit ke teman-teman kamu! <a href="" class="btn-btn-primary">Share</a> </p>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6">	
+			<div class="list-group">
+			   	<button type="button" class="list-group-item active">{{ userdata.profile.name }} Timeline</button>
+				{% for tweet in userdata.usertimeline %}
+			  	<button type="button" class="list-group-item">
+			  			<span class="col-sm-2">
+			  				<img src="{{tweet.img}}" alt="user-img">
+			  			</span>
+			  			<span class="col-sm-10">
+		  					<span class="col-sm-12">
+		  						{{ tweet.name }} @{{ tweet.screen_name }} {{ tweet.created_at }} via {{ tweet.source }} R {{ tweet.retweet_count }} F {{ tweet.favorite_count }}
+		  					</span>
+			  				<span class="col-sm-12">
+			  					{{ tweet.text | safe }}
+			  				</span>
+			  			</span>
+			  	</button>
+				{% endfor %}
+			</div>
+		</div>
+		<div class="col-md-6">	
+			<div class="list-group">
+			   	
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
