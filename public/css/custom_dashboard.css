@@ -22,6 +22,16 @@
 	padding-right: 5px;
 }
 
+.fa-question-circle{
+	font-size: 12px;
+	color: #000;
+}
+
+.tooltip-inner {
+    min-width: 300px;
+}
+
+
 .user-panel{
 
 }
@@ -105,3 +115,20 @@
 	.usertimeline-list>.item>.tweet-detail>p.text{
 		font-size: 11px;
 	}
+
+.widget-user .widget-user-header {
+    height: 200px;
+}
+
+.success-profile {
+	padding: 5px 0px;
+}
+
+.mention-list .mention-img img {
+	width: 24px;
+	height: 24px;
+}
+
+.mention-list .mention-info {
+	margin-left: 30px;
+}

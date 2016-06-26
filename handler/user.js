@@ -19,8 +19,8 @@ var oauth = {
 home = function(req, res){
   var cookie = req.cookies.token;
   console.log("Cookie di home "+cookie);
-  res.render('home.html');
-  // res.render('dash.html');
+  // res.render('home.html');
+  res.render('prof.html');
 }
 
 login = function(req, res){
@@ -113,7 +113,6 @@ dashboard = function(req, res){
   console.log("Cookie di dashboard "+cookie);
 
   User.find({user_id : cookie}, function (err, docs) {
-    console.log("Isi data dari database = "+docs);
     if (docs.length===0){
       console.log("data user tidak ada, length = "+docs.length);
       res.redirect("/login");
@@ -223,36 +222,6 @@ dashboard = function(req, res){
       );
     }
   });
-}
-
-// Fungsi menghitung data yang sama dalam array
-// source   => array tempat menampung data dari twitter
-// storage  => array tempat menampung data hasil perhitungan
-function countToArrayObject(source, storage){
-  for(i=0; i<source.length; i++){
-    if(i===0){
-      storage.push(source[i]);
-      storage[i].count += 1
-    }
-    if(i>0){
-      var cek = 0;
-      for(j = 0; j < storage.length; j++){
-        if((source[i].key === storage[j].key) === true){
-          cek = 1;
-          pos = j;
-          break;
-        } 
-      }
-      
-      if(cek === 0){
-        storage.push(source[i]);
-        storage[storage.length -1 ].count += 1;
-      }
-      else{
-        storage[pos].count += 1;
-      }
-    }
-  }
 }
 
 // Fungsi untuk parsing twitter URLs dari text
