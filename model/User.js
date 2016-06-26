@@ -1,7 +1,8 @@
-var mongoose = require('mongoose');
+var mongoose = require('mongoose'),
+    config   = require("../config");
 var Schema = mongoose.Schema;
 
-mongoose.connect('mongodb://username:password@ds023064.mlab.com:23064/db_funteam');
+mongoose.connect("mongodb://admin:admin123@ds023674.mlab.com:23674/team_db");
 
 var userSchema = new Schema({
   user_id             : { type: String, required: true, unique: true },
@@ -14,7 +15,6 @@ var userSchema = new Schema({
   updated_at          : Date
 });
 
-var User = mongoose.model('User', userSchema);
 
 userSchema.pre('save', function(next) {
   var currentDate = new Date();
@@ -24,6 +24,6 @@ userSchema.pre('save', function(next) {
   next();
 });
 
-
+var User = mongoose.model('User', userSchema);
 
 module.exports = User;

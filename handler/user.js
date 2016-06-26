@@ -3,7 +3,7 @@ var config  = require('../config'),
     request = require('request'),
     User    = require('../model/user'),
     handler;
-  
+    
 var requestTokenUrl     = "https://api.twitter.com/oauth/request_token",
     consumerKey         = config.consumer_key,
     consumerSecret      = config.consumer_secret,
@@ -18,13 +18,14 @@ var oauth = {
 
 home = function(req, res){
   var cookie = req.cookies.token;
-  console.log(cookie);
+  console.log("Cookie di home "+cookie);
   res.render('home.html');
+  // res.render('dash.html');
 }
 
 login = function(req, res){
     var cookie = req.cookies.token;
-    console.log(oauth);
+    console.log("Cookie di login = "+cookie);
     if(cookie === undefined){
       request.post({url : requestTokenUrl, oauth : oauth}, function (e, r, body){
         if(e){
@@ -32,7 +33,6 @@ login = function(req, res){
         }
         else {
           var reqData = qs.parse(body);
-          console.log(body);
           oauthToken = reqData.oauth_token;
           oauthTokenSecret = reqData.oauth_token_secret;
 
@@ -66,22 +66,27 @@ callback  = function(req, res){
       var authenticatedData = qs.parse(body);
 
       User.find({user_id : authenticatedData.user_id}, function (err, docs) {
-        if (!docs.length){
-
+        if (docs.length === 0){
+          console.log("User belum ada di database");
           var user = new User({
             user_id             : authenticatedData.user_id,
             oauth_token         : authenticatedData.oauth_token,
             oauth_token_secret  : authenticatedData.oauth_token_secret,
             screen_name         : authenticatedData.screen_name,
             x_auth_expires      : authenticatedData.x_auth_expires,
-            premium             : 0,
+            premium             : 0
           });
 
           user.save(function(err) {
-            if (err) throw err;
-
-            console.log('User saved successfully!');
+            if (err)
+              console.log("Gagal disimpan");
+            else
+              console.log('User berhasil disimpan!');
           });
+        }
+        else
+        {
+          console.log("User di database sudah ada!");
         }
       });
        
@@ -105,99 +110,68 @@ callback  = function(req, res){
 
 dashboard = function(req, res){
   var cookie            = req.cookies.token;
+  console.log("Cookie di dashboard "+cookie);
 
   User.find({user_id : cookie}, function (err, docs) {
-    if (!docs.length)
+    console.log("Isi data dari database = "+docs);
+    if (docs.length===0){
+      console.log("data user tidak ada, length = "+docs.length);
       res.redirect("/login");
+    }
+    else{
+      // Get 10 Twit terakhir dari user yang melakukan sign in
+      var ut = "https://api.twitter.com/1.1/statuses/user_timeline.json" + "?"
+      + qs.stringify({user_id: cookie, count: 10});
 
-    // Get 10 Twit terakhir dari user yang melakukan sign in
-    var ut = "https://api.twitter.com/1.1/statuses/user_timeline.json" + "?"
-    + qs.stringify({screen_name: docs[0].screen_name, count: 10});
-
-    // Get 10 Twit terakhir dari home / orang yang difollow
-    var ht = "https://api.twitter.com/1.1/statuses/home_timeline.json" + "?"
-      + qs.stringify({count: 10});
-
-
-    var authenticationData = {
-      consumer_key    : consumerKey,
-      consumer_secret : consumerSecret,
-      token           : docs[0].oauth_token,
-      token_secret    : docs[0].oauth_token_secret
-    };
-
-    var userdata          = {};
-   
+      // Get 10 Twit terakhir dari home / orang yang difollow
+      var ht = "https://api.twitter.com/1.1/statuses/home_timeline.json" + "?"
+        + qs.stringify({count: 10});
 
 
-    // request User Timeline
-    request.get(
-      {
-        url   : ut,
-        oauth : authenticationData,
-        json  : true
-      }, 
-      function(e, r, body){
-        if(e){
-          res.send(404);
-        }
-        else{
-          var usertimeline         = [];
-          var profile              = {};
+      var authenticationData = {
+        consumer_key    : consumerKey,
+        consumer_secret : consumerSecret,
+        token           : docs[0].oauth_token,
+        token_secret    : docs[0].oauth_token_secret
+      };
 
-          //Twitter Info
-          profile.name             = body[0].user.name;
-          profile.screen_name      = body[0].user.screen_name;
-          profile.img              = body[0].user.profile_image_url;
-          profile.description      = body[0].user.description;
-          profile.location         = body[0].user.location;
-          profile.tweets_count     = body[0].user.statuses_count;
-          profile.created          = body[0].user.created_at;
-          profile.statuses_count   = body[0].user.statuses_count;
+      var userdata          = {};
 
-          //Followers Info
-          profile.follower         = body[0].user.followers_count;
-          profile.following        = body[0].user.friends_count;
-          profile.listed           = body[0].user.listed_count;
-          profile.followers_ratio  = (profile.follower / profile.following).toFixed(2);
-
-          for(i in body){
-            // Ambil tweet dari user
-            var tweetObj = body[i];
-            usertimeline.push(
-            {
-              text            : tweetObj.text.parseURL().parseHashtag().parseUsername(),
-              name            : tweetObj.user.name,
-              screen_name     : tweetObj.user.screen_name,
-              img             : tweetObj.user.profile_image_url,
-              created_at      : tweetObj.created_at.parseDate(),
-              source          : tweetObj.source.parseSource(),
-              retweet_count   : tweetObj.retweet_count,
-              favorite_count  : tweetObj.favorite_count
-            });
+      // request User Timeline
+      request.get(
+        {
+          url   : ut,
+          oauth : authenticationData,
+          json  : true
+        }, 
+        function(e, r, body){
+          if(e){
+            res.send(404);
           }
-          userdata.profile      = profile;
-          userdata.usertimeline = usertimeline;
-      }}
-    );
+          else{
+            var usertimeline         = [];
+            var profile              = {};
 
-    // request Home Timeline
-    request.get(
-      {
-        url   : ht,
-        oauth : authenticationData,
-        json  : true
-      }, 
-      function(e, r, body){
-        if(e){
-          res.send(404);
-        }
-        else{
-          var hometimeline = [];
-          for(i in body){
-            // Ambil tweet dari user
-            var tweetObj = body[i];
-            hometimeline.push(
+            //Twitter Info
+            profile.name             = body[0].user.name;
+            profile.screen_name      = body[0].user.screen_name;
+            profile.img              = body[0].user.profile_image_url;
+            profile.description      = body[0].user.description;
+            profile.location         = body[0].user.location;
+            profile.tweets_count     = body[0].user.statuses_count;
+            profile.created          = body[0].user.created_at;
+            profile.statuses_count   = body[0].user.statuses_count;
+
+            //Followers Info
+            profile.follower         = body[0].user.followers_count;
+            profile.following        = body[0].user.friends_count;
+            profile.listed           = body[0].user.listed_count;
+            profile.followers_ratio  = (profile.follower / profile.following).toFixed(2);
+
+            for(i in body){
+              // Ambil tweet dari user
+              var tweetObj = body[i];
+              usertimeline.push(
               {
                 text            : tweetObj.text.parseURL().parseHashtag().parseUsername(),
                 name            : tweetObj.user.name,
@@ -207,15 +181,47 @@ dashboard = function(req, res){
                 source          : tweetObj.source.parseSource(),
                 retweet_count   : tweetObj.retweet_count,
                 favorite_count  : tweetObj.favorite_count
-              }
-            );
-          }
-          userdata.hometimeline  = hometimeline;
-          console.log(userdata.profile);
-          res.render('dashboard.html',{'userdata':userdata});
+              });
+            }
+            userdata.profile      = profile;
+            userdata.usertimeline = usertimeline;
         }}
-    );
+      );
 
+      // request Home Timeline
+      request.get(
+        {
+          url   : ht,
+          oauth : authenticationData,
+          json  : true
+        }, 
+        function(e, r, body){
+          if(e){
+            res.send(404);
+          }
+          else{
+            var hometimeline = [];
+            for(i in body){
+              // Ambil tweet dari user
+              var tweetObj = body[i];
+              hometimeline.push(
+                {
+                  text            : tweetObj.text.parseURL().parseHashtag().parseUsername(),
+                  name            : tweetObj.user.name,
+                  screen_name     : tweetObj.user.screen_name,
+                  img             : tweetObj.user.profile_image_url,
+                  created_at      : tweetObj.created_at.parseDate(),
+                  source          : tweetObj.source.parseSource(),
+                  retweet_count   : tweetObj.retweet_count,
+                  favorite_count  : tweetObj.favorite_count
+                }
+              );
+            }
+            userdata.hometimeline  = hometimeline;
+            res.render('dash.html',{'userdata':userdata});
+          }}
+      );
+    }
   });
 }
 

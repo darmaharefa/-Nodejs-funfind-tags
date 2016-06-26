@@ -8,7 +8,7 @@ var express	= require("express"),
 router = function(app){
 	r.get("/", h.home);
 	r.get("/dashboard",auth,h.dashboard);
-	r.get("/profile",auth, p.profile);
+	r.get("/profile",auth,p.profile);
 	r.get("/login", h.login);
 	r.get("/callback",h.callback);
 	app.use(r);

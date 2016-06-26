@@ -4,7 +4,7 @@ function unauthorized(res){
 
 function auth(req, res, next){
 	user = req.cookies.token || "";
-	console.log(user);
+	console.log("Cookie auth di browser = "+user);
 	if (user != ""){
 		return next();
 	};

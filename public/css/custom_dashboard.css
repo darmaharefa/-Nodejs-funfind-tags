@@ -1,0 +1,107 @@
+.main-header{
+	
+}
+	.main-header>.navbar>a.title{
+		color: #fff;
+		font-size: 30px;
+		margin-left: 70px;
+	}
+
+
+.content-wrapper, .main-header>.navbar, .main-footer {
+	margin: 0px;
+}
+
+.content-wrapper {
+	padding: 0px 50px;
+}
+
+.text-grey {
+	color : #999;
+	padding-left: 3px;
+	padding-right: 5px;
+}
+
+.user-panel{
+
+}
+	.user-panel>.info>.user-name {
+		margin-bottom: 8px;
+	}
+
+	.user-panel>.info>.user-name>.screen_name>a {
+		color: #0088cc;
+		font-size: 18px;
+	}
+
+	.user-panel>.info>.screen_name>a:hover {
+		color: #0066cc;
+		text-decoration: underline;
+	}
+
+	.user-panel>.info>.user-name>.name{
+		color : #999;
+		font-size: 16px;
+	}
+
+.account-info{
+	padding: 10px;
+}
+
+.fitur {
+	padding: 0px 10px;
+}
+	.fitur>.fitur-list>.box{
+		margin-bottom: 0px;
+	}
+
+.note-text{
+	padding: 10px;
+	font-size: 11px;
+	font-style: italic;
+	font-weight: bold;
+}
+
+.box-body-usertimeline{
+	height: 340px;
+	overflow: auto; 
+}
+
+.usertimeline-list {
+	list-style: none;
+	margin:0px;
+	padding:0px;
+}
+	.usertimeline-list>.item{
+		border-bottom:1px solid #ccc;
+		box-shadow: none;
+		padding: 5px 0px;
+	}
+
+	.usertimeline-list>.item>.user-img{
+		float: left;
+	}
+
+	.usertimeline-list>.item>.tweet-detail{
+		margin-left: 60px;
+	}
+
+	.usertimeline-list>.item>.tweet-detail>a.name{
+		color: #000;
+		font-weight: 600;
+	}
+
+	.usertimeline-list>.item>.tweet-detail>a.name:hover{
+		text-decoration: underline;
+	}
+
+	.usertimeline-list>.item>.tweet-detail>.info{
+		color: #999;
+		font-size: 12px;
+	}
+		.usertimeline-list>.item>.tweet-detail>.info>span{
+			padding-right: 5px;
+		}	
+	.usertimeline-list>.item>.tweet-detail>p.text{
+		font-size: 11px;
+	}

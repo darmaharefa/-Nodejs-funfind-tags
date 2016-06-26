@@ -1,0 +1,173 @@
+{% extends "base2.html" %}
+
+{% block title %} Dashboard {% endblock %}
+
+{% block content %}
+
+<!-- Main content -->
+  <section class="content">
+
+  <div class="row">
+    <!-- User Info -->
+    <div class="col-md-6">
+     <div class="box box-warning">
+        <div class="user-panel">
+          <div class="pull-left image">
+            <img src="{{userdata.profile.img}}" class="img-circle" alt="User Image">
+          </div>
+          <div class="pull-left info">
+            <div class="user-name">
+             <span class="screen_name">
+                <a href="">@{{userdata.profile.screen_name}}</a>
+             </span>
+             <span class="name">
+               {{userdata.profile.name}}
+             </span>
+            </div>
+            
+            <div class="user-follow">
+              <span class="label label-default">
+                {{ userdata.profile.statuses_count }}
+              </span><span class="text-grey"> tweets</span>
+              <span class="label label-success">
+                {{ userdata.profile.follower }}
+              </span><span class="text-grey"> follower</span>
+              <span class="label label-primary">
+                {{ userdata.profile.following }}
+              </span><span class="text-grey"> following</span>
+              <span class="label label-danger">
+                {{ userdata.profile.listed }}
+              </span><span class="text-grey"> listed</span>
+            </div>
+          </div>
+        </div>
+        <div class="account-info">
+          <p>
+            Selamat datang {{ userdata.profile.name }}. Kamu sedang menggunakan akun free. <a href="" class="btn-btn-primary">Upgrade</a> untuk mengakses fitur premium 
+          </p>
+          <p>
+            Jika anda merasa senang dengan aplikasi kami, Silahkan share aplikasi Ngitwit ke teman-teman kamu! <a href="" class="btn-btn-primary">Share</a>
+          </p>
+        </div>
+        <div class="fitur">
+          <div class="fitur-list">
+             <div class="box box-warning box-solid">
+              <div class="box-header with-border">
+                <h3 class="box-title">Fitur </h3>
+                <div class="box-tools pull-right">
+                  <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="box-body">
+                <i class="fa fa-diamond"> Tampilkan profile lengkap dari kamu</i> <br>
+                <i class="fa fa-diamond"> Tampilkan profile lengkap dari kamu</i> <br>
+                <i class="fa fa-diamond"> Tampilkan profile lengkap dari kamu</i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="note">
+          <div class="note-text">
+            * nantikan fitur terbaru dari kami
+          </div>
+        </div>
+     </div>
+    </div>
+    <!-- User Info End -->
+  </div>
+
+  <div class="row">
+    <!-- User Timeline -->
+    <div class="col-md-6">
+      <div class="box box-success box-solid">
+          <div class="box-header with-border">
+            <h3 class="box-title">DarmaH24 Timeline</h3>
+            <div class="box-tools pull-right">
+              <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+              </button>
+              <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i>
+              </button>
+            </div>
+          </div>
+          <!-- /.box-header -->
+          <div class="box-body box-body-usertimeline">
+            <ul class="usertimeline-list">
+              {% for tweet in userdata.usertimeline %}
+              <li class="item">
+                <div class="user-img">
+                  <img src="{{tweet.img}}" alt="usr-img">
+                </div>
+                <div class="tweet-detail">
+                  <a href="https://twitter.com/{{tweet.screen_name}}" class="name"> {{ tweet.name }}</a>
+                  <span class="info">
+                    <span class="screen_name"> @{{ tweet.screen_name }}</span>
+                    <span class="created_at"> {{ tweet.created_at }}</span> 
+                    <span class="via"> via {{ tweet.source }}</span>
+                    <span class="retweet">
+                      <i class="fa fa-retweet"></i> {{ tweet.retweet_count }}
+                    </span>
+                    <span class="favorite"> 
+                      <i class="fa fa-star-o"></i> {{ tweet.favorite_count }}
+                    </span>
+                  </span>
+                  <p class="text"> {{ tweet.text | safe }} </p>
+                </div>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          <!-- /.box-body -->
+      </div>
+    </div>
+    <!-- User Timeline End -->
+
+    <!-- Home Timeline -->
+    <div class="col-md-6">
+      <div class="box box-success box-solid">
+          <div class="box-header with-border">
+            <h3 class="box-title">Home Timeline</h3>
+            <div class="box-tools pull-right">
+              <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+              </button>
+              <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i>
+              </button>
+            </div>
+          </div>
+          <!-- /.box-header -->
+          <div class="box-body box-body-usertimeline">
+            <ul class="usertimeline-list">
+              {% for tweet in userdata.hometimeline %}
+              <li class="item">
+                <div class="user-img">
+                  <img src="{{tweet.img}}" alt="usr-img">
+                </div>
+                <div class="tweet-detail">
+                  <a href="https://twitter.com/{{tweet.screen_name}}" class="name"> {{ tweet.name }}</a>
+                  <span class="info">
+                    <span class="screen_name"> @{{ tweet.screen_name }}</span>
+                    <span class="created_at"> {{ tweet.created_at }}</span> 
+                    <span class="via"> via {{ tweet.source }}</span>
+                    <span class="retweet">
+                      <i class="fa fa-retweet"></i> {{ tweet.retweet_count }}
+                    </span>
+                    <span class="favorite"> 
+                      <i class="fa fa-star-o"></i> {{ tweet.favorite_count }}
+                    </span>
+                  </span>
+                  <p class="text"> {{ tweet.text | safe }} </p>
+                </div>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          <!-- /.box-body -->
+      </div>
+    </div>
+    <!-- Home Timeline End -->
+  </div>
+
+</section>
+<!-- /.content -->
+
+{% endblock %}
