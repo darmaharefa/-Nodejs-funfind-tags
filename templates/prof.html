@@ -94,15 +94,15 @@
             </div>
             <!-- User Mention Count End -->
 
-            <!-- Hastag Count -->
+            <!-- hashtag Count -->
             <div class="col-lg-6">
               <div class="small-box bg-green">
                 <div class="inner">
-                 <h3>{{userdata.analisis.hastag_count}}<span style="color:#ccc;font-size:16px">/ 100</span></h3>
+                 <h3>{{userdata.analisis.hashtag_count}}<span style="color:#ccc;font-size:16px">/ 100</span></h3>
 
                   <p>
-                    Hastags
-                    <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="right" title="Jumlah tweet yang mengandung hastags. Semakin tinggi angkanya, semakin besar kemungkinan tweet kamu terdapat di pencarian "></i>
+                    hashtags
+                    <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="right" title="Jumlah tweet yang mengandung hashtags. Semakin tinggi angkanya, semakin besar kemungkinan tweet kamu terdapat di pencarian "></i>
                   </p>
                 </div>
                 <div class="icon">
@@ -290,13 +290,13 @@
     </div>
     <!-- Analysis Tweet Per Hari Box End -->
 
-    <!-- Hastag Count Box Start -->
+    <!-- hashtag Count Box Start -->
     <div class="col-md-6">
       <div class="row">
         <div class="col-md-6">
           <div class="box box-primary">
             <div class="box-header with-border">
-              <h3 class="box-title">Hastag Most Used</h3>
+              <h3 class="box-title">Hashtag Most Used</h3>
 
               <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -306,16 +306,17 @@
             </div>
             <div class="box-body">
               <ul class="products-list product-list-in-box mention-list">
+                {% for i in userdata.hashtag_obj %}
                 <li class="item">
                   <div class="product-img mention-img">
-                    <i class="fa fa-circle" style="color:#000;padding-right: 10px"></i>
-                    <img src="dist/img/default-50x50.gif" alt="User Image">
+                    <i class="fa fa-circle" style="color:{{i.color}}"></i>
                   </div>
                   <div class="product-info mention-info">
-                    <a href="javascript:void(0)" class="product-title">#harefa
-                      <span class="label label-warning pull-right">20</span></a>
+                    <a href="https://twitter.com/search?q=%23{{i.key}}" class="product-title">{{i.label}}
+                      <span class="label label-warning pull-right">{{i.value}}</span></a>
                   </div>
                 </li>
+                {% endfor %}
               </ul>
             </div>
           </div>
@@ -333,14 +334,14 @@
             </div>
             <div class="box-body">
               <div class="chart-responsive">
-                <canvas id="tweetSource" height="150"></canvas>
+                <canvas id="tweetHashtag" height="150"></canvas>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <!-- Hastag Count Box End -->
+    <!-- hashtag Count Box End -->
     
     <!-- User Mentioned Count Box Start -->
     <div class="col-md-6">
@@ -448,6 +449,8 @@
 
   var tweetSource   = [{{userdata.url_final | safe}}];
 
+  var hashtagCount  = [{{userdata.hashtag_final | safe}}]
+
   var areaChartOptions  = {
     //Boolean - If we should show the scale at all
     showScale: true,
@@ -511,37 +514,43 @@
     maintainAspectRatio: true
   };
 
-    //-------------
-    //- PIE CHART -
-    //-------------
-    // Get context with jQuery - using jQuery's .get() method.
-    var pieChartCanvas = $("#tweetSource").get(0).getContext("2d");
-    var pieChart = new Chart(pieChartCanvas);
+  var pieOptions = {
+    //Boolean - Whether we should show a stroke on each segment
+    segmentShowStroke: true,
+    //String - The colour of each segment stroke
+    segmentStrokeColor: "#fff",
+    //Number - The width of each segment stroke
+    segmentStrokeWidth: 2,
+    //Number - The percentage of the chart that we cut out of the middle
+    percentageInnerCutout: 50, // This is 0 for Pie charts
+    //Number - Amount of animation steps
+    animationSteps: 100,
+    //String - Animation easing effect
+    animationEasing: "easeOutBounce",
+    //Boolean - Whether we animate the rotation of the Doughnut
+    animateRotate: true,
+    //Boolean - Whether we animate scaling the Doughnut from the centre
+    animateScale: false,
+    //Boolean - whether to make the chart responsive to window resizing
+    responsive: true,
+    // Boolean - whether to maintain the starting aspect ratio or not when responsive, if set to false, will take up entire container
+    maintainAspectRatio: true,
+  };
 
-    var pieOptions = {
-      //Boolean - Whether we should show a stroke on each segment
-      segmentShowStroke: true,
-      //String - The colour of each segment stroke
-      segmentStrokeColor: "#fff",
-      //Number - The width of each segment stroke
-      segmentStrokeWidth: 2,
-      //Number - The percentage of the chart that we cut out of the middle
-      percentageInnerCutout: 50, // This is 0 for Pie charts
-      //Number - Amount of animation steps
-      animationSteps: 100,
-      //String - Animation easing effect
-      animationEasing: "easeOutBounce",
-      //Boolean - Whether we animate the rotation of the Doughnut
-      animateRotate: true,
-      //Boolean - Whether we animate scaling the Doughnut from the centre
-      animateScale: false,
-      //Boolean - whether to make the chart responsive to window resizing
-      responsive: true,
-      // Boolean - whether to maintain the starting aspect ratio or not when responsive, if set to false, will take up entire container
-      maintainAspectRatio: true,
-    };
+//-------------
+//- Tweet Source Chart -
+//-------------
+var pieChartCanvas2 = $("#tweetHashtag").get(0).getContext("2d");
+var pieChart2 = new Chart(pieChartCanvas2);
+pieChart2.Doughnut(hashtagCount, pieOptions);
 
-    pieChart.Doughnut(tweetSource, pieOptions);
+
+//-------------
+//- Tweet Source Chart -
+//-------------
+var pieChartCanvas = $("#tweetSource").get(0).getContext("2d");
+var pieChart = new Chart(pieChartCanvas);
+pieChart.Doughnut(tweetSource, pieOptions);
 
   //-------------
   //- TWEET PER MOUNT CHART -

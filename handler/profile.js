@@ -30,9 +30,9 @@ profile = function(req, res){
 		var url_catch       = [];
 		var url_obj        	= [];
 		var url_final		= [];
-		var hastag_catch	= [];
-		var hastag_obg 		= [];
-		var hastag_final	= [];
+		var hashtag_catch	= [];
+		var hashtag_obj 	= [];
+		var hashtag_final	= [];
 	   
 	    request.get(
 	      {
@@ -49,7 +49,7 @@ profile = function(req, res){
 	          	var analisis			 = 
 	          	{
 	          		usermention_count	 : 0,
-	          		hastag_count		 : 0,
+	          		hashtag_count		 : 0,
 	          		replay_count		 : 0,
 	          		retweet_count		 : 0,
 	          		media_count			 : 0,
@@ -112,7 +112,7 @@ profile = function(req, res){
 	                  		if(tmp_exec!= null){
 	                   			url_catch.push(
 	                   				{
-	                   					value 		: 0,
+	                   					value 		: 1,
 	                   					color		: getRandomColor(),
 									    highlight	: this.color,
 	                   					label 		: tmp_exec[1],
@@ -123,24 +123,24 @@ profile = function(req, res){
 	                	}
 	                }
 
-	                // Cek apakah terdapat hastag disetiap tweet dari user
+	                // Cek apakah terdapat hashtag disetiap tweet dari user
               		if(tweetObj.entities.hashtags.length > 0){
-                		analisis.hastag_count += 1;
+                		analisis.hashtag_count += 1;
 
-            //     		// Simpan setiap url yang ada dalam tweet ke dalam array url_catch
-	           //      	var hastag_tmp    = body[i].entities.hastags;
-	           //      	for(var j = 0; j<hastag_tmp.length; j++)
-	           //      	{
-            //        			hastag_catch.push(
-            //        				{
-            //        					value 		: 0,
-            //        					color		: getRandomColor(),
-								    // highlight	: this.color,
-            //        					label 		: tmp_exec[1],
-            //        					key 		: tmp_exec[0],
-            //        				}
-            //        			);
-	           //      	}
+                		// Simpan setiap url yang ada dalam tweet ke dalam array url_catch
+	                	var hashtag_tmp    = body[i].entities.hashtags;
+	                	for(var j = 0; j<hashtag_tmp.length; j++)
+	                	{
+                   			hashtag_catch.push(
+                   				{
+                   					value 		: 1,
+                   					color		: getRandomColor(),
+								    highlight	: this.color,
+                   					label 		: "#"+hashtag_tmp[j].text,
+                   					key 		: hashtag_tmp[j].text,
+                   				}
+                   			);
+	                	}
                 		
               		}
 
@@ -197,15 +197,22 @@ profile = function(req, res){
                 }
 
                 countToArrayObject(url_catch,url_obj);
+                countToArrayObject(hashtag_catch,hashtag_obj);
+
                 toStringfy(url_obj, url_final);
+                toStringfy(hashtag_obj, hashtag_final);
+
                 // console.log(url_catch);
                 // console.log(url_obj);
-                userdata.dayTweet 	= dayTweet;
-                userdata.monthTweet = monthTweet;
-	          	userdata.analisis   = analisis;
-	          	userdata.profile 	= profile;
-	          	userdata.url_obj	= url_obj;
-	          	userdata.url_final	= url_final;
+                userdata.dayTweet 		= dayTweet;
+                userdata.monthTweet 	= monthTweet;
+	          	userdata.analisis   	= analisis;
+	          	userdata.profile 		= profile;
+	          	userdata.url_obj		= url_obj;
+	          	userdata.url_final		= url_final;
+
+	          	userdata.hashtag_obj 	= hashtag_obj;
+	          	userdata.hashtag_final	= hashtag_final;
 
 	          	console.log(userdata);
 

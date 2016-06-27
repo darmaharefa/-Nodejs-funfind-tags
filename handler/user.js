@@ -143,8 +143,6 @@ dashboard = function(req, res){
       var usertimeline      = [];
       var hometimeline      = [];
 
-     
-
       // request Home Timeline
       request.get(
         {
@@ -173,9 +171,9 @@ dashboard = function(req, res){
                 }
               );
             }
-
             userdata.hometimeline  = hometimeline;
-          }}
+          }
+        }
       );
 
        // request User Timeline
@@ -236,29 +234,29 @@ dashboard = function(req, res){
 // data tweet dari api adalah plain text
 // parsing URLs dari plain text dan diubah ke tag html <a href="">
 String.prototype.parseURL = function() {
-	return this.replace(/[A-Za-z]+:\/\/[A-Za-z0-9-_]+\.[A-Za-z0-9-_:%&~\?\/.=]+/g, function(url) {
-		return url.link(url);
-	});
+  return this.replace(/[A-Za-z]+:\/\/[A-Za-z0-9-_]+\.[A-Za-z0-9-_:%&~\?\/.=]+/g, function(url) {
+    return url.link(url);
+  });
 };
 
 // Fungsi untuk parsing twitter hastag dari text
 // data tweet dari api adalah plain text
 // parsing hastag dari plain text dan diubah ke link http://search.twitter.com/search?q="+hastag
 String.prototype.parseHashtag = function() {
-	return this.replace(/[#]+[A-Za-z0-9-_]+/g, function(t) {
-		var tag = t.replace("#","%23")
-		return t.link("https://twitter.com/search?q="+tag);
-	});
+  return this.replace(/[#]+[A-Za-z0-9-_]+/g, function(t) {
+    var tag = t.replace("#","%23")
+    return t.link("https://twitter.com/search?q="+tag);
+  });
 };
 
 // Fungsi untuk parsing twitter @mention dari text
 // data tweet dari api adalah plain text
 // parsing @mention dari plain text dan diubah ke link http://twitter.com/"+username
 String.prototype.parseUsername = function() {
-	return this.replace(/[@]+[A-Za-z0-9-_]+/g, function(u) {
-		var username = u.replace("@","")
-		return u.link("http://twitter.com/"+username);
-	});
+  return this.replace(/[@]+[A-Za-z0-9-_]+/g, function(u) {
+    var username = u.replace("@","")
+    return u.link("http://twitter.com/"+username);
+  });
 };
 
 // Fungsi untuk parsing twitter created_at menjadi format date umum
@@ -277,7 +275,7 @@ String.prototype.parseSource = function(){
 }
 
 handler = {
-	home         : home,
+  home         : home,
   login        : login,
   dashboard    : dashboard,
   callback     : callback
