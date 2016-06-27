@@ -324,7 +324,7 @@
         <div class="col-md-6">
           <div class="box box-primary">
             <div class="box-header with-border">
-              <h3 class="box-title">URL Chart</h3>
+              <h3 class="box-title">Hastag Chart</h3>
 
               <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -359,25 +359,17 @@
             </div>
             <div class="box-body">
               <ul class="products-list product-list-in-box mention-list">
+                {% for i in userdata.mention_obj %}
                 <li class="item">
                   <div class="product-img mention-img">
-                    <img src="dist/img/default-50x50.gif" alt="User Image">
-                  </div>
-                  <div class="product-info">
-                    <a href="javascript:void(0)" class="product-title">@Darmah24
-                      <span class="label label-warning pull-right">20</span></a>
-                  </div>
-                </li>
-                <!-- /.item -->
-                <li class="item">
-                  <div class="product-img mention-img">
-                    <img src="dist/img/default-50x50.gif" alt="User Image">
+                    <i class="fa fa-circle" style="color:{{i.color}};"></i>
                   </div>
                   <div class="product-info mention-info">
-                    <a href="javascript:void(0)" class="product-title">@MisterDev25
-                      <span class="label label-info pull-right">10</span></a>
+                    <a href="https://twitter.com/{{i.label}}" class="product-title">@{{i.label}}
+                      <span class="label label-info pull-right">{{i.value}}</span></a>
                   </div>
                 </li>
+                {% endfor %}
               </ul>
             </div>
           </div>
@@ -385,7 +377,7 @@
         <div class="col-md-6">
           <div class="box box-primary">
             <div class="box-header with-border">
-              <h3 class="box-title">URL Chart</h3>
+              <h3 class="box-title">User Mentioned Chart</h3>
 
               <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -395,7 +387,7 @@
             </div>
             <div class="box-body">
               <div class="chart-responsive">
-                <canvas id="tweetSource" height="150"></canvas>
+                <canvas id="tweetMention" height="150"></canvas>
               </div>
             </div>
           </div>
@@ -450,6 +442,8 @@
   var tweetSource   = [{{userdata.url_final | safe}}];
 
   var hashtagCount  = [{{userdata.hashtag_final | safe}}]
+
+  var mentionCount  = [{{userdata.mention_final | safe}}]
 
   var areaChartOptions  = {
     //Boolean - If we should show the scale at all
@@ -538,7 +532,15 @@
   };
 
 //-------------
-//- Tweet Source Chart -
+//- User Mention Chart -
+//-------------
+var pieChartCanvas3 = $("#tweetMention").get(0).getContext("2d");
+var pieChart3 = new Chart(pieChartCanvas3);
+pieChart3.Doughnut(mentionCount, pieOptions);
+
+
+//-------------
+//- Hastag Chart -
 //-------------
 var pieChartCanvas2 = $("#tweetHashtag").get(0).getContext("2d");
 var pieChart2 = new Chart(pieChartCanvas2);
