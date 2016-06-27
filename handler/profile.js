@@ -2,7 +2,6 @@ var config  		= require('../config'),
     qs      		= require('querystring'),
     request 		= require('request'),
     User    		= require('../model/user'),
-    fs 				= require('fs'),
 	consumerKey     = config.consumer_key,
     consumerSecret 	= config.consumer_secret,
     handler;
@@ -27,12 +26,19 @@ profile = function(req, res){
 	    };
 
 	    var userdata        = {};
+
 		var url_catch       = [];
 		var url_obj        	= [];
 		var url_final		= [];
+
 		var hashtag_catch	= [];
 		var hashtag_obj 	= [];
 		var hashtag_final	= [];
+
+		var mention_catch	= [];
+		var mention_obj 	= [];
+		var mention_final	= [];
+
 	   
 	    request.get(
 	      {
@@ -78,10 +84,6 @@ profile = function(req, res){
 
 	          	for(i in body){
 	            	var tweetObj = body[i];
-
-	              	// Cek apakah terdapat user_mentions disetiap tweet dari user
-	              	if(tweetObj.entities.user_mentions.length > 0)
-	                	analisis.usermention_count += 1;
 
                 	// Cek apakah terdapat replay disetiap tweet dari user
               		if(tweetObj.in_reply_to_user_id != undefined)
@@ -144,7 +146,26 @@ profile = function(req, res){
                 		
               		}
 
-            		// countTweetPerMount(tweetObj.created_at);
+              		 // Cek apakah terdapat hashtag disetiap tweet dari user
+              		if(tweetObj.entities.user_mentions.length > 0){
+                		analisis.usermention_count += 1;
+
+                		// Simpan setiap url yang ada dalam tweet ke dalam array url_catch
+	                	var usermention_tmp    = body[i].entities.user_mentions;
+	                	for(var j = 0; j<usermention_tmp.length; j++)
+	                	{
+                   			mention_catch.push(
+                   				{
+                   					value 		: 1,
+                   					color		: getRandomColor(),
+								    highlight	: this.color,
+                   					label 		: usermention_tmp[j].screen_name,
+                   					key 		: usermention_tmp[j].name
+                   				}
+                   			);
+	                	}
+                		
+              		}
 
             		// Hitung jumlah tweet tiap bulan
             		if(tweetObj.created_at !== null) {
@@ -198,9 +219,11 @@ profile = function(req, res){
 
                 countToArrayObject(url_catch,url_obj);
                 countToArrayObject(hashtag_catch,hashtag_obj);
+                countToArrayObject(mention_catch,mention_obj);
 
                 toStringfy(url_obj, url_final);
                 toStringfy(hashtag_obj, hashtag_final);
+                toStringfy(mention_obj, mention_final);
 
                 // console.log(url_catch);
                 // console.log(url_obj);
@@ -208,17 +231,49 @@ profile = function(req, res){
                 userdata.monthTweet 	= monthTweet;
 	          	userdata.analisis   	= analisis;
 	          	userdata.profile 		= profile;
+
 	          	userdata.url_obj		= url_obj;
 	          	userdata.url_final		= url_final;
 
 	          	userdata.hashtag_obj 	= hashtag_obj;
 	          	userdata.hashtag_final	= hashtag_final;
 
+	          	userdata.mention_obj 	= mention_obj;
+	          	userdata.mention_final	= mention_final;
+
+
 	          	console.log(userdata);
 
 	          	res.render('prof.html',{'userdata':userdata});
 	      	}
 	    });
+	});
+}
+
+account = function(req, res){
+	console.log(req.cookies.token);
+	var cookie = req.cookies.token;
+
+	User.find({user_id : cookie}, function (err, docs) {
+	    if (!docs.length)
+	      res.redirect("/login");
+
+	  	console.log(docs[0].created_at.toString());
+	  	userdata 				= {};
+	  	userdata.name  			= docs[0].screen_name;
+
+	  	var temp 				= docs[0].created_at.toString();
+	  	temp 					= temp.split(" ");
+	  	userdata.created_at 	= temp[2]+" "+temp[1]+" "+temp[3];
+
+	  	userdata.premium		= false;
+	  	if(docs[0].premium)
+	  		userdata.premium	= true;
+
+	  	console.log(userdata);
+
+	  	res.render("account.html",{"userdata":userdata});
+	 
 	});
 }
 
@@ -274,7 +329,8 @@ function getRandomColor() {
 
 
 handler = {
-	profile     : profile
+	profile     : profile,
+	account		: account
 }
 
 module.exports = handler;

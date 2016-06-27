@@ -44,7 +44,7 @@
           <li><a href="/dashboard"> <i class="fa fa-dashboard"></i> Dashboard</a></li>
           <li><a href="/profile"><i class="fa fa-user"></i> Profile</a></li>
           <li>
-            <a href="/account" data-toggle="control-sidebar"><i class="fa fa-gears"></i> Account</a>
+            <a href="/account"><i class="fa fa-gears"></i> Account</a>
           </li>
           <li><a href="/logout"><i class="fa fa-power-off"></i> Sign out</a></li>
         </ul>
@@ -57,14 +57,17 @@
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
-      <h1>
-        Selamar Datang <b>{{userdata.profile.name}}</b>
-        <small>Kami telah berhasil melakukan analisis terhadap akun twitter anda, Enjoy it ! <i class="fa fa-heart"></i></small>
-      </h1>
-      <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li class="active">Dashboard</li>
-      </ol>
+      {% if userdata %}
+        <h1>
+          Selamat Datang <b>{{userdata.profile.name}}</b>
+          <small>Kami telah berhasil melakukan analisis terhadap akun twitter anda, Enjoy it ! <i class="fa fa-heart"></i></small>
+        </h1>
+      {% else %}
+        <h1>
+          Selamat Datang</b>
+          <small>Silahkan login dengan akun twitter anda.</small>
+        </h1>
+      {% endif %}
     </section>
 
     {% block content %} {% endblock %}

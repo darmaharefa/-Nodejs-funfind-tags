@@ -230,6 +230,11 @@ dashboard = function(req, res){
   });
 }
 
+logout = function(req, res){
+  res.clearCookie('token', {path: '/'});
+  res.redirect("/dashboard");
+};
+
 // Fungsi untuk parsing twitter URLs dari text
 // data tweet dari api adalah plain text
 // parsing URLs dari plain text dan diubah ke tag html <a href="">
@@ -255,7 +260,7 @@ String.prototype.parseHashtag = function() {
 String.prototype.parseUsername = function() {
   return this.replace(/[@]+[A-Za-z0-9-_]+/g, function(u) {
     var username = u.replace("@","")
-    return u.link("http://twitter.com/"+username);
+    return u.link("https://twitter.com/"+username);
   });
 };
 
@@ -278,7 +283,8 @@ handler = {
   home         : home,
   login        : login,
   dashboard    : dashboard,
-  callback     : callback
+  callback     : callback,
+  logout       : logout
 }
 
 module.exports = handler;

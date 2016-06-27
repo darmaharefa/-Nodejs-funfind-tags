@@ -1,3 +1,26 @@
-<h1>Signin with Twitter</h1>
+{% extends "base2.html" %}
 
-<a href="{{url}}">Signin</a>
+{% block title %} Login Page {% endblock %}
+
+{% block content %}
+
+<!-- Main content -->
+<section class="content">
+
+	<div class="row">
+		<div class="col-md-6 col-md-offset-3">
+			<div class="panel panel-default">
+		        <div class="panel-heading"><b>Signin with Twitter</div>
+		        <div class="panel-body">
+		        	<i class="fa fa-twitter" style="padding-right: 5px;color:#3c8dbc;font-size: 20px"></i>
+		        	<a href="{{url}}" style="color:#3c8dbc;font-size: 20px">Sign in</a> <br> <br>
+		        	<p style="font-size: 11px"><i>silahkan login menggunakan akun twitter anda untuk mendapatkan analisis dari kami</i></p>
+		        </div>
+		    </div>
+		</div>
+	</div>
+
+</section>
+<!-- /.content -->
+
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "base2.html" %}
+
+{% block title %} Dashboard {% endblock %}
+
+{% block content %}
+
+<!-- Main content -->
+<section class="content">
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-default">
+          <div class="panel-heading">Akun ngitwologi kamu</div>
+          <div class="panel-body">
+            <h3>Detail Akun Anda</h3>
+            <table class="table table-hover">
+              <tbody>
+                <tr>
+                  <td>Nama</td>
+                  <td>: {{userdata.name}}</td>
+                </tr>
+                <tr>
+                  <td>Aku dibuat</td>
+                  <td>: {{userdata.created_at}}</td>
+                </tr>
+                <tr>
+                  <td>Akun type</td>
+                    {% if userdata.premium %}
+                      <td>: <span class="label label-warning">Premium</span></td>
+                    {% else %}
+                      <td>: <span class="label label-default">Basic</span></td>
+                    {% endif %}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+    </div>
+  </div>
+
+</section>
+<!-- /.content -->
+
+{% endblock %}
