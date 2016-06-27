@@ -30,6 +30,9 @@ profile = function(req, res){
 		var url_catch       = [];
 		var url_obj        	= [];
 		var url_final		= [];
+		var hastag_catch	= [];
+		var hastag_obg 		= [];
+		var hastag_final	= [];
 	   
 	    request.get(
 	      {
@@ -39,7 +42,7 @@ profile = function(req, res){
 	      }, 
 	      function(e, r, body){
 	        if(e){
-	        	res.send(404);
+	        	res.sendStatus(404);
 	        }
 	        else{
 	          	var profile              = {};
@@ -54,10 +57,6 @@ profile = function(req, res){
 	          	};
 	          	var monthTweet			 = [0,0,0,0,0,0,0,0,0,0,0,0];
 	          	var dayTweet			 = [0,0,0,0,0,0,0];
-	          	var url_catch        	 = [];
-		      	var url_obj           	 = [];
-		      	var source_catch     	 = [];
-		      	var source_obj     	   	 = [];
 
 	          	//Twitter Info
 	          	profile.name             = body[0].user.name;
@@ -83,10 +82,6 @@ profile = function(req, res){
 	              	// Cek apakah terdapat user_mentions disetiap tweet dari user
 	              	if(tweetObj.entities.user_mentions.length > 0)
 	                	analisis.usermention_count += 1;
-
-              		// Cek apakah terdapat hastag disetiap tweet dari user
-              		if(tweetObj.entities.hashtags.length > 0)
-                		analisis.hastag_count += 1;
 
                 	// Cek apakah terdapat replay disetiap tweet dari user
               		if(tweetObj.in_reply_to_user_id != undefined)
@@ -114,8 +109,6 @@ profile = function(req, res){
 	                  		var regXurl    = /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)/;
 	                  		var tmp_exec   = regXurl.exec(urls_tmp[j].expanded_url);
 
-	                  		var x 		   = Math.floor((Math.random() * 9) + 0);
-	                  		var y 		   = Math.floor((Math.random() * 9) + 0);
 	                  		if(tmp_exec!= null){
 	                   			url_catch.push(
 	                   				{
@@ -129,6 +122,28 @@ profile = function(req, res){
 	                  		}
 	                	}
 	                }
+
+	                // Cek apakah terdapat hastag disetiap tweet dari user
+              		if(tweetObj.entities.hashtags.length > 0){
+                		analisis.hastag_count += 1;
+
+            //     		// Simpan setiap url yang ada dalam tweet ke dalam array url_catch
+	           //      	var hastag_tmp    = body[i].entities.hastags;
+	           //      	for(var j = 0; j<hastag_tmp.length; j++)
+	           //      	{
+            //        			hastag_catch.push(
+            //        				{
+            //        					value 		: 0,
+            //        					color		: getRandomColor(),
+								    // highlight	: this.color,
+            //        					label 		: tmp_exec[1],
+            //        					key 		: tmp_exec[0],
+            //        				}
+            //        			);
+	           //      	}
+                		
+              		}
+
             		// countTweetPerMount(tweetObj.created_at);
 
             		// Hitung jumlah tweet tiap bulan

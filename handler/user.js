@@ -19,8 +19,8 @@ var oauth = {
 home = function(req, res){
   var cookie = req.cookies.token;
   console.log("Cookie di home "+cookie);
-  // res.render('home.html');
-  res.render('prof.html');
+  res.render('home.html');
+  // res.render('prof.html');
 }
 
 login = function(req, res){
@@ -78,18 +78,21 @@ callback  = function(req, res){
           });
 
           user.save(function(err) {
-            if (err)
+            if (err){
               console.log("Gagal disimpan");
-            else
+            }
+            else{
               console.log('User berhasil disimpan!');
+            }
           });
         }
         else
         {
           console.log("User di database sudah ada!");
         }
+
       });
-       
+
       res.cookie(
         'token',authenticatedData.user_id, {
         domain: 'localhost',
@@ -97,6 +100,7 @@ callback  = function(req, res){
         httpOnly: true,
         maxAge: 900000,
       });
+       
 
       oauth.token           = "";
       oauth.token_secret    = "";
@@ -135,8 +139,46 @@ dashboard = function(req, res){
       };
 
       var userdata          = {};
+      var profile           = {};
+      var usertimeline      = [];
+      var hometimeline      = [];
 
-      // request User Timeline
+     
+
+      // request Home Timeline
+      request.get(
+        {
+          url   : ht,
+          oauth : authenticationData,
+          json  : true
+        }, 
+        function(e, r, body){
+          if(e){
+            res.send(404);
+          }
+          else{
+            for(i in body){
+              // Ambil tweet dari user
+              var tweetObj = body[i];
+              hometimeline.push(
+                {
+                  text            : tweetObj.text.parseURL().parseHashtag().parseUsername(),
+                  name            : tweetObj.user.name,
+                  screen_name     : tweetObj.user.screen_name,
+                  img             : tweetObj.user.profile_image_url,
+                  created_at      : tweetObj.created_at.parseDate(),
+                  source          : tweetObj.source.parseSource(),
+                  retweet_count   : tweetObj.retweet_count,
+                  favorite_count  : tweetObj.favorite_count
+                }
+              );
+            }
+
+            userdata.hometimeline  = hometimeline;
+          }}
+      );
+
+       // request User Timeline
       request.get(
         {
           url   : ut,
@@ -148,9 +190,6 @@ dashboard = function(req, res){
             res.send(404);
           }
           else{
-            var usertimeline         = [];
-            var profile              = {};
-
             //Twitter Info
             profile.name             = body[0].user.name;
             profile.screen_name      = body[0].user.screen_name;
@@ -182,43 +221,12 @@ dashboard = function(req, res){
                 favorite_count  : tweetObj.favorite_count
               });
             }
-            userdata.profile      = profile;
-            userdata.usertimeline = usertimeline;
-        }}
-      );
 
-      // request Home Timeline
-      request.get(
-        {
-          url   : ht,
-          oauth : authenticationData,
-          json  : true
-        }, 
-        function(e, r, body){
-          if(e){
-            res.send(404);
-          }
-          else{
-            var hometimeline = [];
-            for(i in body){
-              // Ambil tweet dari user
-              var tweetObj = body[i];
-              hometimeline.push(
-                {
-                  text            : tweetObj.text.parseURL().parseHashtag().parseUsername(),
-                  name            : tweetObj.user.name,
-                  screen_name     : tweetObj.user.screen_name,
-                  img             : tweetObj.user.profile_image_url,
-                  created_at      : tweetObj.created_at.parseDate(),
-                  source          : tweetObj.source.parseSource(),
-                  retweet_count   : tweetObj.retweet_count,
-                  favorite_count  : tweetObj.favorite_count
-                }
-              );
-            }
-            userdata.hometimeline  = hometimeline;
+            userdata.profile         = profile;
+            userdata.usertimeline    = usertimeline;
             res.render('dash.html',{'userdata':userdata});
-          }}
+          }
+        }
       );
     }
   });
