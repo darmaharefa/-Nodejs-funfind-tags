@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "start": "node app.js"
+  },
   "name": "funfind-beta",
   "version": "1.0.0",
   "description": "",
