@@ -33,4 +33,13 @@
 
 {% endblock %}
 
+{% block optional %}
+
+<script type="text/javascript">
+  if (document.cookie.indexOf('username') < 0) {
+      $('#alogout').hide();
+  }
+</script>
+{% endblock %}
+
 
