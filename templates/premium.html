@@ -1,0 +1,30 @@
+{% extends "base2.html" %}
+
+{% block title %} Dashboard {% endblock %}
+
+{% block content %}
+
+<!-- Main content -->
+<section class="content">
+
+  <div class="row">
+    <div class="col-md-6 col-md-offset-3">
+       <div class="well">
+        {% if userdata.premium %}
+          <h4> Akun anda sudah <span class="label label-warning">Premium</span></h4>
+        {% else %}
+          <h4> <i class="fa fa-unlock"></i> <b>How to Upgrade</b></h4>
+          <hr>
+          <p>Untuk melakukan upgrade akun ke <span class="label label-warning">premium</span> anda hanya perlu share ngitwologi ke teman-teman anda melalui twitter.</p>
+          <p>Setelah share, harap kembali beberapa saat lagi atau tunggu paling lama 1x24 jam. Tim kami akan melakukan upgrade terhadap akun ngitwologi anda</p>
+
+          <a href="http://twitter.com/share?text=Thanks ngitwologi&url=http://ngitwologic-67563.onmodulus.net/&hashtags=ngitwologi,nodejs,javascript" class="btn-btn-primary" style="font-size: 25px"><span class="label label-primary"> <i class="fa fa-twitter"></i>  Share Ngitwologi</span></a>
+        {% endif %}
+       </div>
+    </div>
+  </div>
+
+</section>
+<!-- /.content -->
+
+{% endblock %}

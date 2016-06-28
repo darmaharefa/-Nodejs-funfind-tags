@@ -277,6 +277,28 @@ account = function(req, res){
 	});
 }
 
+premium = function(req, res){
+	console.log(req.cookies.token);
+	var cookie = req.cookies.token;
+
+	User.find({user_id : cookie}, function (err, docs) {
+	    if (!docs.length)
+	      res.redirect("/login");
+
+	  	userdata 				= {};
+
+	  	userdata.premium		= false;
+	  	if(docs[0].premium)
+	  		userdata.premium	= true;
+
+	  	res.render("premium.html",{"userdata":userdata});
+	});
+
+	 
+}
+
+
+
 // Fungsi menghitung data yang sama dalam array
 // source   => array tempat menampung data dari twitter
 // storage  => array tempat menampung data hasil perhitungan
@@ -330,7 +352,8 @@ function getRandomColor() {
 
 handler = {
 	profile     : profile,
-	account		: account
+	account		: account,
+	premium 	: premium
 }
 
 module.exports = handler;
