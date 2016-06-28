@@ -43,7 +43,12 @@
         </div>
         <div class="account-info">
           <p>
-            Selamat datang {{ userdata.profile.name }}. <br> Kamu sedang menggunakan akun basic. <a href="/premium"><span class="label label-warning">Upgrade</span></a>   untuk mengakses fitur premium 
+            Selamat datang {{ userdata.profile.name }}. <br> 
+            {% if userdata.premium  == false %}
+              Kamu sedang menggunakan akun basic. <a href="/premium"><span class="label label-warning">Upgrade</span></a>   untuk mengakses fitur premium 
+            {% else %}
+              Selamat, anda menggunakan akun <span class="label label-warning">premium</span>
+            {% endif %}
           </p>
           <p>
             Jika anda merasa senang dengan aplikasi kami, Silahkan share aplikasi Ngitwit ke teman-teman kamu! <a href="http://twitter.com/share?text=Thanks ngitwologi&url=http://ngitwologic-67563.onmodulus.net/&hashtags=ngitwologi,nodejs,javascript" class="btn-btn-primary"><span class="label label-primary"> <i class="fa fa-twitter"></i>  Share</span></a>

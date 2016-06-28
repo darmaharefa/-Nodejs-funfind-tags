@@ -143,6 +143,8 @@ dashboard = function(req, res){
       var usertimeline      = [];
       var hometimeline      = [];
 
+      userdata.premium      = docs[0].premium; 
+
       // request Home Timeline
       request.get(
         {
