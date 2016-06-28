@@ -3,7 +3,7 @@ var config  = require('../config'),
     request = require('request'),
     User    = require('../model/user'),
     handler;
-    
+
 var requestTokenUrl     = "https://api.twitter.com/oauth/request_token",
     consumerKey         = config.consumer_key,
     consumerSecret      = config.consumer_secret,
@@ -58,7 +58,7 @@ callback  = function(req, res){
 
   request.post(
     {
-      url   : accessTokenUrl , 
+      url   : accessTokenUrl ,
       oauth : oauth
     },
     function(e, r, body)
@@ -100,7 +100,7 @@ callback  = function(req, res){
         httpOnly: true,
         maxAge: 900000,
       });
-       
+
 
       oauth.token           = "";
       oauth.token_secret    = "";
@@ -108,8 +108,8 @@ callback  = function(req, res){
 
       res.redirect("/dashboard");
     }
-  ); 
-  // console.log(res.cookies);  
+  );
+  // console.log(res.cookies);
 };
 
 dashboard = function(req, res){
@@ -149,7 +149,7 @@ dashboard = function(req, res){
           url   : ht,
           oauth : authenticationData,
           json  : true
-        }, 
+        },
         function(e, r, body){
           if(e){
             res.send(404);
@@ -182,7 +182,7 @@ dashboard = function(req, res){
           url   : ut,
           oauth : authenticationData,
           json  : true
-        }, 
+        },
         function(e, r, body){
           if(e){
             res.send(404);
