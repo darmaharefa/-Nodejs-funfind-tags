@@ -24,3 +24,12 @@
 <!-- /.content -->
 
 {% endblock %}
+
+{% block optional %}
+
+<script type="text/javascript">
+  if (document.cookie.indexOf('token') < 0) {
+      $('#logout').hide();
+  }
+</script>
+{% endblock %}
