@@ -29,7 +29,7 @@ login = function(req, res){
     if(cookie === undefined){
       request.post({url : requestTokenUrl, oauth : oauth}, function (e, r, body){
         if(e){
-          res.send("Error, Silahkan coba beberapa saat lagi");
+          res.render('error.html');
         }
         else {
           var reqData = qs.parse(body);
